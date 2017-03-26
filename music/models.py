@@ -24,7 +24,7 @@ class Genre(models.Model):
 
 class Record(models.Model):
     def __str__(self):
-        return self.title
+        return self.band_fk.name + ': ' + self.title
     band_fk = models.ForeignKey(Band, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
     label_fk= models.ForeignKey(Label, on_delete=models.CASCADE)
@@ -33,7 +33,7 @@ class Record(models.Model):
 
 class Track(models.Model):
     def __str__(self):
-        return self.name
+        return self.record_fk.band_fk.name + ': ' + self.record_fk.title + ' - ' + self.name
     record_fk = models.ForeignKey(Record, on_delete=models.CASCADE)
     name =  models.CharField(max_length=200)
     number = models.IntegerField(default=0)

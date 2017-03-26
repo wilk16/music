@@ -1,0 +1,22 @@
+{% load music_extras%}
+{% load static %}
+
+
+<h1>{{record.title}} <i>({{record.release_date}})</i> </h1>
+<h2>by <i><a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a></i></h2>
+<ul>
+	{% for track in record.track_set.all|sort_by:'number' %}
+	{{track.number}}. {{track.name}} [{{track.length|time:"i:s" }}]<br>
+{% endfor %}
+</ul>
+
+
+
+See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a> records:<br>
+<ul>
+{% for all_record in band_records%}
+{% if all_record.id != 123 %}
+<li><a href={% url 'music:record' all_record.id %}>{{ all_record.title }}</a></li>
+{% endif %}
+{% endfor %}
+</ul>
