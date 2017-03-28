@@ -1,7 +1,8 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
-from .models import Band, Record, Track
+from .models import Band, Record, Track, OwnedRecord
 from django.views import generic
+from django.utils import timezone
 
 # Create your views here.
 
@@ -38,3 +39,11 @@ class RecordView(generic.DetailView):
         context['band_records'] = Record.objects.filter(band_fk=band_id).exclude(id = self.kwargs.get('pk'))
         return context
 
+class UserPanelView(generic.ListView):
+    model = OwnedRecord
+    template_name = 'music/userPanel.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UserPanelView, self).get_context_data(**kwargs)
+        context['recent_records'] = OwnedRecord.objects.filter(purchase_date__lte=timezone.now())
+        return context

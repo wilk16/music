@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -8,6 +9,12 @@ class Band(models.Model):
         return self.name
     name = models.CharField(max_length=200)
     origin = models.CharField(max_length=100)
+    create_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.SET_NULL)
+    create_date = models.DateTimeField(auto_now_add=True)
+    modify_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.SET_NULL)
+    modify_date = models.DateTimefield(auto_now=True)
 
 class Label(models.Model):
     def __str__(self):

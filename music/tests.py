@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from music.models import Band, Record, Genre, Label, Track
+from music.models import Band, Record, Genre, Label, Track, OwnedRecord
 from django.urls import reverse
 from django.utils import timezone
 import datetime
@@ -91,6 +91,58 @@ class RecordViewTests(TestCase):
         self.assertEqual(response.context['tracks'].count(), 2)
         self.assertEqual(response.context['tracks'][0].name, 't1')
         self.assertEqual(response.context['tracks'][1].length,
-                         datetime.time(0,3,13))
+                          datetime.time(0,3,13))
 
+class UserPanelViewTests(TestCase):
+    """
+    Testing of user panel view
+    """
+    def setUp(self):
+        """
+        Set up basic record objectsView
+        """
+        self.band = Band(name='myBand', origin='Testland')
+        self.label = Label(name='Test_music', city='Testcity',
+                        country='testcountry', address='testaddr')
+        self.genre = Genre(name='testgenre')
+        self.band.save()
+        self.label.save()
+        self.genre.save()
+        self.record = Record(band_fk = self.band, title='mytitle',
+                          label_fk = self.label,
+                          genre_fk = self.genre,
+                          release_date = '2017-02-03')
+        self.c = Client()
 
+    def test_display_last_records_with_no_records(self):
+        """
+        Check if context list is empty
+        """
+        response = self.c.get(reverse('music:userPanel'))
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['recent_records'], [])
+
+    def test_display_last_records_with_record_from_past(self):
+        """
+        Check if record bought in past is displayed
+        """
+        self.ownedRec = OwnedRecord(record_fk=self.record,
+                                    purchase_date = timezone.now() + datetime.timedelta(days=-2),
+                                   disc_type = 'vinyl')
+        self.ownedRec.save()
+        response = self.c.get(reverse('music:userPanel'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['recent_records'].count(), 1)
+
+    def test_display_last_records_with_record_from_future(self):
+        """
+        Check if record bought with future_date(preorder?) will not be
+        displayed
+        """
+        self.ownedRec = OwnedRecord(record_fk=self.record,
+                                    purchase_date = timezone.now() + datetime.timedelta(days=2),
+                                   disc_type = 'vinyl')
+        self.ownedRec.save()
+        response = self.c.get(reverse('music:userPanel'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['recent_records'].count(), 0) 
