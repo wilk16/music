@@ -1,17 +1,16 @@
-{% load music_extras%}
 {% load static %}
-
-
 <h1>{{record.title}} <i>({{record.release_date}})</i> </h1>
 <h2>by <i><a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a></i></h2>
+{% if tracks%}
 <ul>
-	{% for track in record.track_set.all|sort_by:'number' %}
-	{{track.number}}. {{track.name}} [{{track.length|time:"i:s" }}]<br>
+{% for track in tracks %}
+{{track.number}}. {{track.name}} [{{track.length|time:"i:s" }}]<br>
 {% endfor %}
 </ul>
-
-
-
+{% else %}
+<p>No tracks available</p>
+{% endif %}
+{% if band_records%}
 See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a> records:<br>
 <ul>
 {% for all_record in band_records%}
@@ -20,3 +19,6 @@ See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.na
 {% endif %}
 {% endfor %}
 </ul>
+{% else %}
+No more {{record.band_fk.name}} records available
+{% endif %}

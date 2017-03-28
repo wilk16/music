@@ -1,11 +1,15 @@
 {% load music_extras%}
 
 <h1>{{band.name}} </h1>
-
+{% if band.record_set.all %}
 <ul>
 {% for record in band.record_set.all|sort_by:'-release_date' %}
 <li>{{record.release_date}}: <a href="{% url 'music:record' record.id%}"> {{record.title}}</a> at {{record.label_fk}} </li>
 {% endfor %}
 </ul>
+{% else %}
+<p>No records available<p>
+{%endif%}
+
 
 

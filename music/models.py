@@ -31,6 +31,9 @@ class Record(models.Model):
     genre_fk= models.ForeignKey(Genre, on_delete=models.CASCADE)
     release_date = models.DateField()
 
+    class Meta:
+        ordering = ['-release_date']
+
 class Track(models.Model):
     def __str__(self):
         return self.record_fk.band_fk.name + ': ' + self.record_fk.title + ' - ' + self.name
@@ -38,6 +41,9 @@ class Track(models.Model):
     name =  models.CharField(max_length=200)
     number = models.IntegerField(default=0)
     length = models.TimeField()
+
+    class Meta:
+        ordering = ['number']
 
 class OwnedRecord(models.Model):
     def __str__(self):
@@ -50,3 +56,5 @@ class OwnedRecord(models.Model):
     purchase_date = models.DateField(default=timezone.now)
     disc_type = models.CharField(max_length=10, choices=disc_type_choice)
 
+    class Meta:
+        ordering = ['-purchase_date']
