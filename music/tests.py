@@ -5,6 +5,35 @@ from django.urls import reverse
 from django.utils import timezone
 import datetime
 
+class BandListViewTests(TestCase):
+    """
+    Tests for BandList view
+    """
+    def setUp(self):
+        self.user = User.objects.create(username='tester')
+        self.c = Client()
+
+    def test_no_bands(self):
+        """
+        Behavior when there are no bands in DB (for some reason?)
+        """
+        response = self.c.get(reverse('music:band_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['objects'], [])
+
+
+    def test_one_band(self):
+        """
+        Behavior when there is a band to display
+        """
+        self.band = Band.objects.create(name='myBand', origin='USA',
+                                       create_by=self.user, modify_by=self.user)
+        response = self.c.get(reverse('music:band_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['objects'].count(), 1)
+
+
+
 class OwnedRecordModelTests(TestCase):
     """
     Tests for OwnedRecords model
@@ -14,11 +43,17 @@ class OwnedRecordModelTests(TestCase):
         self.band = Band.objects.create(name='myBand', origin='USA',
                                        create_by=self.user, modify_by=self.user)
         self.label = Label.objects.create(name='Test_music', city='Testcity',
-                            country='testcountry', address='testaddr')
-        self.genre = Genre.objects.create(name='testgenre')
+                            country='testcountry', address='testaddr',
+                                         create_by=self.user,
+                                         modify_by=self.user)
+        self.genre = Genre.objects.create(name='testgenre',
+                                         create_by=self.user,
+                                         modify_by=self.user)
         self.record = Record.objects.create(band_fk = self.band,
                         title='mytitle', label_fk = self.label,
-                        genre_fk = self.genre, release_date = '2017-02-03')
+                        genre_fk = self.genre, release_date = '2017-02-03',
+                                         create_by=self.user,
+                                         modify_by=self.user)
 
     def test_OwnedRecord_create(self):
         """
@@ -60,14 +95,14 @@ class BandModelTests(TestCase):
         test create_by and modify_by fields behavior
         """
         self.user2 = User.objects.create(username='modifier')
-        self.assertEqual(self.band.create_by, User.objects.get(pk=1),
+        self.assertEqual(self.band.create_by, self.user,
                         'wrong create_by before update')
         self.band.name = 'new_band'
-        self.band.modify_by = User.objects.get(pk = 2)
+        self.band.modify_by = self.user2
         self.band.save()
-        self.assertEqual(self.band.create_by, User.objects.get(pk=1),
+        self.assertEqual(self.band.create_by, self.user,
                         'wrong create_by after update')
-        self.assertEqual(self.band.modify_by, User.objects.get(pk=2),
+        self.assertEqual(self.band.modify_by, self.user2,
                         'wrong modify_by')
         self.assertEqual(self.band.name, 'new_band', 'band name not modified')
         self.assertEqual(self.band.origin, 'USA', 'band origin changed')
@@ -90,12 +125,18 @@ class RecordModelTests(TestCase):
         self.band = Band.objects.create(name='myBand', origin='Testland',
                                        create_by=self.user, modify_by=self.user)
         self.label = Label.objects.create(name='Test_music', city='Testcity',
-                            country='testcountry', address='testaddr')
-        self.genre = Genre.objects.create(name='testgenre')
+                            country='testcountry', address='testaddr',
+                                         create_by=self.user,
+                                         modify_by=self.user)
+        self.genre = Genre.objects.create(name='testgenre',
+                                         create_by=self.user,
+                                         modify_by=self.user)
         srecord = Record.objects.create(band_fk = self.band, title='test_title',
                               label_fk = self.label,
                               genre_fk = self.genre,
-                             release_date = timezone.now())
+                             release_date = timezone.now(),
+                                         create_by=self.user,
+                                         modify_by=self.user)
         self.assertEqual(srecord.title, "test_title")
 
 

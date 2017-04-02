@@ -6,6 +6,22 @@ from django.utils import timezone
 
 # Create your views here.
 
+class BandListView(generic.ListView):
+    template_name = 'music/band_list.html'
+
+    def get_queryset(self):
+        """
+        It seems that I must have a get_queryset method...
+        """
+        return [1]
+
+    def get_context_data(self, **kwargs):
+        context = super(BandListView, self).get_context_data(**kwargs)
+        context['objects'] = Band.objects.all().order_by('name')
+        context['object_type'] = 'Bands'
+        return context
+
+
 class IndexView(generic.ListView):
     template_name = 'music/index.html'
 

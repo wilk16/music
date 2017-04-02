@@ -1,0 +1,16 @@
+{% extends "music/base.html" %}
+{% block title %}Band_list{% endblock %}
+{% block content %}
+
+
+<h1>Bands in store:</h1>
+{%if objects %}
+<ul>
+{% for object in objects %}
+<li><a href={% url 'music:band' object.id%}>{{ object.name }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p>Oups! There are no bands at the time</p>
+{% endif %}
+{% endblock %}
