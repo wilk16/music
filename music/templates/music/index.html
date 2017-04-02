@@ -1,7 +1,9 @@
-{% load static %}
-<link rel="stylesheet" type="text/css" href="{% static 'music/style.css' %}"/>
+{% extends "music/base.html" %}
+{% block title %}index{% endblock %}
+{% block content %}
 
-<h1>Here are some bands to browse</h1>
+
+<h1>Here are some bands in catalogue</h1>
 {%if ordered_bands %}
 <ul>
 {% for band in ordered_bands %}
@@ -22,3 +24,4 @@
 {% else %}
 <p>No records available</p>
 {% endif %}
+{% endblock %}

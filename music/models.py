@@ -10,11 +10,13 @@ class Band(models.Model):
     name = models.CharField(max_length=200)
     origin = models.CharField(max_length=100)
     create_by = models.ForeignKey(User, default = 1,
-                                  on_delete=models.SET_NULL)
+                                  on_delete=models.CASCADE,
+                                 related_name='band_create_by')
     create_date = models.DateTimeField(auto_now_add=True)
     modify_by = models.ForeignKey(User, default = 1,
-                                  on_delete=models.SET_NULL)
-    modify_date = models.DateTimefield(auto_now=True)
+                                  on_delete=models.CASCADE,
+                                 related_name='band_modify_by')
+    modify_date = models.DateTimeField(auto_now=True)
 
 class Label(models.Model):
     def __str__(self):
@@ -23,11 +25,27 @@ class Label(models.Model):
     city = models.CharField(max_length=200)
     country = models.CharField(max_length=200)
     address = models.CharField(max_length=200)
+    create_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='label_create_by')
+    create_date = models.DateTimeField(auto_now_add=True)
+    modify_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='label_modify_by')
+    modify_date = models.DateTimeField(auto_now=True)
 
 class Genre(models.Model):
     def __str__(self):
         return self.name
     name = models.CharField(max_length=200)
+    create_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='gener_create_by')
+    create_date = models.DateTimeField(auto_now_add=True)
+    modify_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='genre_create_by')
+    modify_date = models.DateTimeField(auto_now=True)
 
 class Record(models.Model):
     def __str__(self):
@@ -37,6 +55,14 @@ class Record(models.Model):
     label_fk= models.ForeignKey(Label, on_delete=models.CASCADE)
     genre_fk= models.ForeignKey(Genre, on_delete=models.CASCADE)
     release_date = models.DateField()
+    create_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='record_create_by')
+    create_date = models.DateTimeField(auto_now_add=True)
+    modify_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='record_modify_by')
+    modify_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-release_date']
@@ -48,6 +74,14 @@ class Track(models.Model):
     name =  models.CharField(max_length=200)
     number = models.IntegerField(default=0)
     length = models.TimeField()
+    create_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='track_create_by')
+    create_date = models.DateTimeField(auto_now_add=True)
+    modify_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='track_modify_by')
+    modify_date = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['number']
@@ -62,6 +96,7 @@ class OwnedRecord(models.Model):
     record_fk = models.ForeignKey(Record, on_delete=models.CASCADE)
     purchase_date = models.DateField(default=timezone.now)
     disc_type = models.CharField(max_length=10, choices=disc_type_choice)
+    user_fk = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
 
     class Meta:
         ordering = ['-purchase_date']

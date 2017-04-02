@@ -1,0 +1,17 @@
+{% extends "music/base.html" %}
+{% block title %}User panel{% endblock %}
+{% block content %}
+
+Hello {{user.get_username}}<br>
+
+{% if recent_records%}
+Here's a list of your latest records
+{% for record in recent_records %}
+<ul>
+<li>{{ record.record_fk.title}}</li>
+</ul>
+{% endfor %}
+{% else %}
+Ups! Seems you haven't bought any records yet.
+{% endif %}
+{% endblock %}

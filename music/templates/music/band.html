@@ -1,3 +1,8 @@
+{% extends "music/base.html" %}
+{% block title %}Band/{{ band.name }}{% endblock %}
+{% block content %}
+
+
 {% load music_extras%}
 
 <h1>{{band.name}} </h1>
@@ -11,5 +16,5 @@
 <p>No records available<p>
 {%endif%}
 
-
+{% endblock %}
 

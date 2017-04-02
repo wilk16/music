@@ -45,5 +45,8 @@ class UserPanelView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserPanelView, self).get_context_data(**kwargs)
-        context['recent_records'] = OwnedRecord.objects.filter(purchase_date__lte=timezone.now())
+        if self.request.user.is_authenticated:
+            context['recent_records'] = OwnedRecord.objects.filter(purchase_date__lte=timezone.now()).filter(user_fk = self.request.user)
+        else:
+            context['recent_records'] = []
         return context

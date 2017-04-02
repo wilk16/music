@@ -1,4 +1,8 @@
-{% load static %}
+{% extends "music/base.html" %}
+{% block title %}Record/{{ record.title }}{% endblock %}
+{% block content %}
+
+
 <h1>{{record.title}} <i>({{record.release_date}})</i> </h1>
 <h2>by <i><a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a></i></h2>
 {% if tracks%}
@@ -22,3 +26,4 @@ See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.na
 {% else %}
 No more {{record.band_fk.name}} records available
 {% endif %}
+{% endblock %}
