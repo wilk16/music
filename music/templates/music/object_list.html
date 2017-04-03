@@ -1,0 +1,27 @@
+{% extends "music/base.html" %}
+{% block title %}index{% endblock %}
+{% block content %}
+
+
+<h1>Here are some bands in catalogue</h1>
+{%if ordered_bands %}
+<ul>
+{% for band in ordered_bands %}
+<li><a href={% url 'music:band' band.id%}>{{ band.name }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No bands are available.</p>
+{% endif %}
+
+<h1>And some albums as well</h1>
+{% if records %}
+<ul>
+{% for record in records%}
+<li><a href={% url 'music:record' record.id%}> {{ record.title }}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No records available</p>
+{% endif %}
+{% endblock %}

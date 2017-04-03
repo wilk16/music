@@ -4,8 +4,12 @@
 
 
 <h1>{{record.title}} <i>({{record.release_date}})</i> </h1>
-<h2>by <i><a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a></i></h2>
+<h2>by 
+{% for band in record.bands.all %}
+<i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
+{% endfor %}
 {% if tracks%}
+</h2>
 <ul>
 {% for track in tracks %}
 {{track.number}}. {{track.name}} [{{track.length|time:"i:s" }}]<br>
@@ -14,6 +18,8 @@
 {% else %}
 <p>No tracks available</p>
 {% endif %}
+
+{% comment %}
 {% if band_records%}
 See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a> records:<br>
 <ul>
@@ -26,4 +32,5 @@ See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.na
 {% else %}
 No more {{record.band_fk.name}} records available
 {% endif %}
+{% endcomment %}
 {% endblock %}

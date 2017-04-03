@@ -18,6 +18,9 @@ class Band(models.Model):
                                  related_name='band_modify_by')
     modify_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['name']
+
 class Label(models.Model):
     def __str__(self):
         return self.name
@@ -34,6 +37,9 @@ class Label(models.Model):
                                  related_name='label_modify_by')
     modify_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['name']
+
 class Genre(models.Model):
     def __str__(self):
         return self.name
@@ -47,13 +53,17 @@ class Genre(models.Model):
                                  related_name='genre_create_by')
     modify_date = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        ordering = ['name']
+
 class Record(models.Model):
     def __str__(self):
-        return self.band_fk.name + ': ' + self.title
-    band_fk = models.ForeignKey(Band, on_delete=models.CASCADE)
+        return self.title
+
+    bands = models.ManyToManyField(Band)
     title = models.CharField(max_length=200)
     label_fk= models.ForeignKey(Label, on_delete=models.CASCADE)
-    genre_fk= models.ForeignKey(Genre, on_delete=models.CASCADE)
+    genres= models.ManyToManyField(Genre)
     release_date = models.DateField()
     create_by = models.ForeignKey(User, default = 1,
                                   on_delete=models.CASCADE,

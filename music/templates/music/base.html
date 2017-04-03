@@ -77,12 +77,13 @@ function closeNav() {
 
 <div id="mySidenav" class="sidenav">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-  <a href="{% url 'music:index' %}">Home</a>
+  <a href="{% url 'music:index'%}">Home</a>
   <a href="{% url 'music:userPanel' %}">User</a>
-  <a href="{% url 'music:band_list'%}">Bands</a>
-  <a href="#">Records</a>
-  <a href="#">Labels</a>
-  <a href="#">Genres</a>
+  <a href="{% url 'music:band_list' 1%}">Bands</a>
+  <a href="{% url 'music:record_list' 1%}">Records</a>
+  <a href="{% url 'music:label_list' 1%}">Labels</a>
+  <a href="{% url 'music:genre_list' 1%}">Genres</a>
+  <a href="#">Contact</a>
 </div>
 
 <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Menu</span>

@@ -1,21 +1,21 @@
 {% extends "music/base.html" %}
-{% block title %}Band_list{% endblock %}
+{% block title %}Genre list{% endblock %}
 {% block content %}
 
-<h1>Bands in store:</h1>
+<h1>Browse available genres:</h1>
 {%if objects %}
 <ul>
 {% for object in objects %}
-<li><a href={% url 'music:band' object.id%}>{{ object.name }}</a></li>
+<li><a href="#">{{ object.name }}</a></li>
 {% endfor %}
 </ul>
 {% else %}
-<p>Oups! There are no bands at the time</p>
+<p>Oups! There are no genres at the time</p>
 {% endif %}
 <div class="pagination">
     <span class="step-links">
         {% if objects.has_previous %}
-            <a href={% url 'music:band_list' objects.previous_page_number %}>previous</a>
+            <a href={% url 'music:genre_list' objects.previous_page_number %}>previous</a>
         {% endif %}
 
         <span class="current">
@@ -23,7 +23,7 @@
         </span>
 
         {% if objects.has_next %}
-            <a href={% url 'music:band_list' objects.next_page_number %}>next</a>
+            <a href={% url 'music:genre_list' objects.next_page_number %}>next</a>
         {% endif %}
     </span>
 </div>
