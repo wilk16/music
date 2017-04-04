@@ -63,14 +63,14 @@
 /* Set the width of the side navigation to 250px */
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
-    document.getElementById("main").style.marginLeft = "250px";
+    /*document.getElementById("main").style.marginLeft = "250px";*/
     document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
 }
 
 /* Set the width of the side navigation to 0 */
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("main").style.marginLeft = "0";
+    /*document.getElementById("main").style.marginLeft = "0";*/
     document.body.style.backgroundColor = "white";
 }
 </script>
@@ -83,7 +83,7 @@ function closeNav() {
   <a href="{% url 'music:record_list' 1%}">Records</a>
   <a href="{% url 'music:label_list' 1%}">Labels</a>
   <a href="{% url 'music:genre_list' 1%}">Genres</a>
-  <a href="#">Contact</a>
+  <a href="{% url 'music:contact'%}">Contact</a>
 </div>
 
 <span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Menu</span>

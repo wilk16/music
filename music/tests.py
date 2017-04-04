@@ -31,7 +31,7 @@ class RecordListViewTests(TestCase):
         self.band = Band.objects.create(name='myBand', origin='USA',
                                        create_by=self.user, modify_by=self.user)
         self.label = Label.objects.create(name='Test_music', city='Testcity',
-                            country='testcountry', address='testaddr',
+                            country='testcountry', website='www.mywebsite.pl',
                                          create_by=self.user,
                                          modify_by=self.user)
         self.genre = Genre.objects.create(name='testgenre',
@@ -77,6 +77,7 @@ class LabelListViewTests(TestCase):
         """
         self.label = Label.objects.create(name='myLabel', city='testCity',
                                           country='mycountry',
+                                          website='www.mywebsite.pl',
                                           create_by=self.user, modify_by=self.user)
         response = self.c.get(reverse('music:label_list', kwargs={'page_nb':1}))
         self.assertEqual(response.status_code, 200)
@@ -155,7 +156,7 @@ class OwnedRecordModelTests(TestCase):
         self.band = Band.objects.create(name='myBand', origin='USA',
                                        create_by=self.user, modify_by=self.user)
         self.label = Label.objects.create(name='Test_music', city='Testcity',
-                            country='testcountry', address='testaddr',
+                            country='testcountry', website='www.mysite.pl',
                                          create_by=self.user,
                                          modify_by=self.user)
         self.genre = Genre.objects.create(name='testgenre',
@@ -239,7 +240,7 @@ class RecordModelTests(TestCase):
         self.band = Band.objects.create(name='myBand', origin='Testland',
                                        create_by=self.user, modify_by=self.user)
         self.label = Label.objects.create(name='Test_music', city='Testcity',
-                            country='testcountry', address='testaddr',
+                            country='testcountry', website='www.mysite.pl',
                                          create_by=self.user,
                                          modify_by=self.user)
         self.genre = Genre.objects.create(name='testgenre',
@@ -268,7 +269,7 @@ class RecordViewTests(TestCase):
                                         create_by = self.user,
                                         modify_by = self.user)
         self.label = Label.objects.create(name='Test_music', city='Testcity',
-                        country='testcountry', address='testaddr',
+                        country='testcountry', website='www.mysite.pl',
                                          create_by=self.user,
                                          modify_by=self.user)
         self.genre = Genre.objects.create(name='testgenre',
@@ -305,7 +306,7 @@ class RecordViewTests(TestCase):
         """
         response = self.c.get(reverse('music:record', args=(self.record.id,)))
         self.assertEqual(response.status_code, 200)
-        #self.assertQuerysetEqual(response.context['band_records'], [])
+        self.assertQuerysetEqual(response.context['band_records'], [])
 
     def test_if_no_tracks_in_record(self):
         """
@@ -347,7 +348,7 @@ class UserPanelViewTests(TestCase):
                                         create_by = self.user,
                                         modify_by = self.user)
         self.label = Label.objects.create(name='Test_music', city='Testcity',
-                        country='testcountry', address='testaddr',
+                        country='testcountry', website='www.mysite.pl',
                                          create_by=self.user,
                                          modify_by=self.user)
         self.genre = Genre.objects.create(name='testgenre',

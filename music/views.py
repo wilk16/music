@@ -1,11 +1,30 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import Band, Record, Track, OwnedRecord, Genre, Label
 from django.views import generic
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from music.forms import ContactForm
+from django.core.mail import send_mail
 
-# Create your views here.
+
+
+
+def contact(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            send_mail(cd['subject'],
+                      cd['message'],
+                      (cd['email']),
+                      ('srampampam@gmail.com',))
+            return HttpResponseRedirect('/music/')
+    else:
+        form = ContactForm()
+    return render(request, 'music/contact_form.html', {'form':form})
+
+
 
 class RecordListView(generic.ListView):
     template_name = 'music/record_list.html'
@@ -142,14 +161,23 @@ class RecordView(generic.DetailView):
         context = super(RecordView, self).get_context_data(**kwargs)
         context['tracks'] = Track.objects.filter(
             record_fk = self.kwargs.get('pk'))
-        #band_id = Record.objects.get(pk=self.kwargs.get('pk')).band_fk.id
-        #context['band_records'] = Record.objects.filter(band_fk=band_id).exclude(id = self.kwargs.get('pk'))
-        #band_records= []
-        #for band in self.bands.all():
-        #    for rec in band.record_set.all().exclude(id=self.id):
-        #        band_records.append(rec)
-        #context['band_records'] = band_records
+        band_records= []
+        r = Record.objects.get(pk=self.kwargs.get('pk'))
+        for band in r.bands.all():
+            for rec in band.record_set.all().exclude(id=r.id):
+                band_records.append(rec)
+        context['band_records'] = band_records
         return context
+
+class GenreView(generic.DetailView):
+    model = Genre
+    template_name = 'music/genre.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(GenreView, self).get_context_data(**kwargs)
+        context['genre_records'] = Genre.objects.get(pk=self.kwargs.get('pk')).record_set.all()[0:10]
+        return context
+
 
 class UserPanelView(generic.ListView):
     model = OwnedRecord

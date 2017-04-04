@@ -27,7 +27,7 @@ class Label(models.Model):
     name = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
     country = models.CharField(max_length=200)
-    address = models.CharField(max_length=200)
+    website = models.URLField(null=True)
     create_by = models.ForeignKey(User, default = 1,
                                   on_delete=models.CASCADE,
                                  related_name='label_create_by')
@@ -44,13 +44,15 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
     name = models.CharField(max_length=200)
+    description = models.TextField(null=True)
+    source = models.URLField(null=True)
     create_by = models.ForeignKey(User, default = 1,
                                   on_delete=models.CASCADE,
                                  related_name='gener_create_by')
     create_date = models.DateTimeField(auto_now_add=True)
     modify_by = models.ForeignKey(User, default = 1,
                                   on_delete=models.CASCADE,
-                                 related_name='genre_create_by')
+                                 related_name='genre_modify_by')
     modify_date = models.DateTimeField(auto_now=True)
 
     class Meta:

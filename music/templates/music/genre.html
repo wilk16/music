@@ -1,0 +1,25 @@
+{% extends "music/base.html" %}
+{% block title %}Genre{{ genre.name }}{% endblock %}
+{% block content %}
+
+
+<h1>{{genre.name}}</h1>
+
+{% if genre.description%}
+<p><i>{{genre.description}}</i></p>
+<p>Source: <a target="blank" href="{{ genre.source }}">en.wikipedia.org</a></p>
+{% else %}
+<p>No description available</p>
+{% endif %}
+
+{% if genre_records%}
+Check out some {{ genre.name }} records:
+{% for rec in genre_records %}
+<li><a href="{% url 'music:record' rec.id %}">{{rec.title}}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+No {{record.band_fk.name}} records available
+{% endif %}
+
+{% endblock %}

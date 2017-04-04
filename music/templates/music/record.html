@@ -19,9 +19,12 @@
 <p>No tracks available</p>
 {% endif %}
 
-{% comment %}
+
 {% if band_records%}
-See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.name}}</a> records:<br>
+See other records by 
+{% for band in record.bands.all %}
+<i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
+{% endfor %}:<br>
 <ul>
 {% for all_record in band_records%}
 {% if all_record.id != 123 %}
@@ -32,5 +35,5 @@ See other <a href="{% url 'music:band' record.band_fk.id %}">{{record.band_fk.na
 {% else %}
 No more {{record.band_fk.name}} records available
 {% endif %}
-{% endcomment %}
+
 {% endblock %}
