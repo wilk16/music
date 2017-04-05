@@ -90,6 +90,7 @@ class Track(models.Model):
     name =  models.CharField(max_length=200)
     number = models.IntegerField(default=0)
     length = models.TimeField()
+    feat = models.ManyToManyField(Band, blank=True)
     create_by = models.ForeignKey(User, default = 1,
                                   on_delete=models.CASCADE,
                                  related_name='track_create_by')

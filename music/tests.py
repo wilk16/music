@@ -333,6 +333,19 @@ class RecordViewTests(TestCase):
         self.assertEqual(response.context['tracks'][1].length,
                           datetime.time(0,3,13))
 
+    def test_display_for_featured_track(self):
+        """
+        Check if featured artist will be seen from recordView
+        """
+        self.t1=Track.objects.create(name='t1', number=1, length='00:12:45',
+                      record_fk =self.record, create_by=self.user,
+                                         modify_by=self.user)
+        self.band_feat = Band.objects.create(name='featBand', origin='Testland',
+                                        create_by = self.user,
+                                        modify_by = self.user)
+        self.t1.feat.add(self.band_feat)
+        self.assertEqual(self.t1.feat.all().count(), 1)
+
 
 
 class UserPanelViewTests(TestCase):

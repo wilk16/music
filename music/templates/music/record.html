@@ -8,11 +8,11 @@
 {% for band in record.bands.all %}
 <i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
 {% endfor %}
-{% if tracks%}
 </h2>
+{% if tracks%}
 <ul>
 {% for track in tracks %}
-{{track.number}}. {{track.name}} [{{track.length|time:"i:s" }}]<br>
+{{track.number}}. {{track.name}}{% if track.feat.all %} (featuring:{% for feats in track.feat.all%}<a href={% url 'music:band' feats.id %}>{{feats.name}}</a>{%if not forloop.last%}, {%endif%}{%endfor%}){%endif%} [{{track.length|time:"i:s" }}]<br>
 {% endfor %}
 </ul>
 {% else %}
@@ -21,15 +21,12 @@
 
 
 {% if band_records%}
-See other records by 
-{% for band in record.bands.all %}
+<h2>See other records by{% for band in record.bands.all %}
 <i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
-{% endfor %}:<br>
+{% endfor %}:</h2>
 <ul>
 {% for all_record in band_records%}
-{% if all_record.id != 123 %}
 <li><a href={% url 'music:record' all_record.id %}>{{ all_record.title }}</a></li>
-{% endif %}
 {% endfor %}
 </ul>
 {% else %}

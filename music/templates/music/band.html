@@ -1,5 +1,5 @@
 {% extends "music/base.html" %}
-{% block title %}Band{{ band.name }}{% endblock %}
+{% block title %}Band {{ band.name }}{% endblock %}
 {% block content %}
 
 
@@ -15,6 +15,15 @@
 {% else %}
 <p>No records available<p>
 {%endif%}
-
+{% if band.track_set.all %}
+Recently featured tracks:
+<ul>
+{% for track in band.track_set.all|sort_by:'-number' %}
+<li><i>{{track.name}}</i> on <a href="{% url 'music:record' track.record_fk.id%}"> {{track.record_fk.title}}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+<p>No features so far<p>
+{%endif%}
 {% endblock %}
 
