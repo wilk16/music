@@ -1,0 +1,27 @@
+{% extends "music/base.html" %}
+{% block title %}Label{{ label.name }}{% endblock %}
+{% block content %}
+
+
+<h1>{{label.name}}</h1>
+
+{% if label.city%}
+<p><i>{{label.city}}</i>{% if label.country %}, {{label.country}}{% endif %}</p>
+{% endif %}
+{% if label.website%}
+<p>Website: <a target="blank" href="{{ label.website }}">{{label.website}}</a></p>
+{% else %}
+<p>No website available</p>
+{% endif %}
+
+{% if label_records%}
+Check out some records from {{ label.name }}:
+{% for rec in label_records %}
+<li><a href="{% url 'music:record' rec.id %}">{{rec.title}}</a></li>
+{% endfor %}
+</ul>
+{% else %}
+No records from  {{label.name}} available
+{% endif %}
+
+{% endblock %}

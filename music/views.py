@@ -26,6 +26,20 @@ def contact(request):
 
 
 
+class LabelView(generic.DetailView):
+    model = Label
+    template_name = 'music/label.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(LabelView, self).get_context_data(**kwargs)
+        context['label_records'] = Label.objects.get(pk=self.kwargs.get('pk')).record_set.all()[0:10]
+        return context
+
+
+
+
+
+
 class RecordListView(generic.ListView):
     template_name = 'music/record_list.html'
 
@@ -48,9 +62,6 @@ class RecordListView(generic.ListView):
 
         context['object_type'] = 'Records'
         return context
-
-
-
 
 
 

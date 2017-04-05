@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 class Band(models.Model):
     def __str__(self):
         return self.name
+
     name = models.CharField(max_length=200)
     origin = models.CharField(max_length=100)
     create_by = models.ForeignKey(User, default = 1,
@@ -24,6 +25,7 @@ class Band(models.Model):
 class Label(models.Model):
     def __str__(self):
         return self.name
+
     name = models.CharField(max_length=200)
     city = models.CharField(max_length=200)
     country = models.CharField(max_length=200)
@@ -43,6 +45,7 @@ class Label(models.Model):
 class Genre(models.Model):
     def __str__(self):
         return self.name
+
     name = models.CharField(max_length=200)
     description = models.TextField(null=True)
     source = models.URLField(null=True)
@@ -81,7 +84,8 @@ class Record(models.Model):
 
 class Track(models.Model):
     def __str__(self):
-        return self.record_fk.band_fk.name + ': ' + self.record_fk.title + ' - ' + self.name
+        return self.record_fk.title + ' - ' + self.name
+
     record_fk = models.ForeignKey(Record, on_delete=models.CASCADE)
     name =  models.CharField(max_length=200)
     number = models.IntegerField(default=0)
