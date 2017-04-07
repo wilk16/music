@@ -2,7 +2,7 @@
 {% load static %}
 <html lang="en">
 <head>
-<link rel="stylesheet" href="style.css" />
+{% comment %}<link rel="stylesheet" href="style.css" /> {% endcomment %}
 <title>{% block title %}Wilkmusic{% endblock %}</title>
 <style>
 /* The side navigation menu */
@@ -55,6 +55,27 @@
     .sidenav a {font-size: 18px;}
 }
 
+
+.headerbar ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #c3c3a2;
+}
+.headerbar li {
+    float: left;
+}
+
+.headerbar li a {
+    color: white;
+    text-align: center;
+    text-decoration: none;
+}
+
+
+
+
 </style>
 </head>
 <body>
@@ -65,13 +86,15 @@ function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
     /*document.getElementById("main").style.marginLeft = "250px";*/
     document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
-}
+    document.getElementById("headerbar2").style.backgroundColor = "rgba(0,0,0,0.4)";
+    }
 
 /* Set the width of the side navigation to 0 */
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
     /*document.getElementById("main").style.marginLeft = "0";*/
     document.body.style.backgroundColor = "white";
+    document.getElementById("headerbar2").style.backgroundColor = "#c3c3a2"
 }
 </script>
 
@@ -86,33 +109,26 @@ function closeNav() {
   <a href="{% url 'music:contact'%}">Contact</a>
 </div>
 
-<span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Menu</span>
+
+<div class="headerbar" position="fixed" id="headerbar">
+<ul id ="headerbar2">
+<li style="float:left"><img src="{% static "images/logo.png" %}" alt="My image"/></li>
 
 
-<div id="main" onclick="closeNav()">
-
-<table style="width=100%">
-<tr>
-<td align="left">	
-<div id="logo">
-<img src="{% static "images/logo.png" %}" alt="My image"/>
-</div>
-</td>
-<td align="rigth">
-<div id="user" align="right">
+<div width="50px" height="50px"><li style="float:right" top="30"><span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Menu</span></li></div>
+<li style="float:right">
 {% if user.get_username%}
-Logged in as:	<a href="{% url 'music:userPanel' %}">{{user.get_username}}</a></br>
-<a href="{% url 'logout' %}">Log out</a>
+Hello:<a href="{% url 'music:userPanel' %}"> {{user.get_username}}</a></br>
+<a position="center" href="{% url 'logout' %}">Log out</a>
 {% else%}
 Hello Anonymus,</br>
 want to <a href="{% url 'login' %}">log in?</a></br>
 {% endif %}
+</li>
+</ul>
 </div>
-</td>
-</tr>
-</table>
 
-
+<div id="main" onclick="closeNav()">
 
 {% block content %}{% endblock %}
 

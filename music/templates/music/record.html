@@ -19,6 +19,15 @@
 <p>No tracks available</p>
 {% endif %}
 
+<h2>Other users thougths on this record</h2>
+{% for review in reviews %}
+{{ review.create_by.username }} wrote on {{review.create_date|date:"j M Y" }} {{ review.create_date|time:"H:i" }}:<br> 
+{{ review.review_text }}<br>
+{{ review.like_counter }} likes<br><br>
+{% empty%}
+There are no comments yet.
+{% endfor %}
+
 
 {% if band_records%}
 <h2>See other records by{% for band in record.bands.all %}
@@ -30,7 +39,11 @@
 {% endfor %}
 </ul>
 {% else %}
-No more {{record.band_fk.name}} records available
+No more records available from {% for band in record.bands.all %}
+<i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
+{% endfor %}
 {% endif %}
+
+
 
 {% endblock %}

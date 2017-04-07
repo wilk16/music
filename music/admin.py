@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Band, Label, Genre, Record, Track, OwnedRecord
+from .models import Band, Label, Genre, Record, Track, OwnedRecord, Review
 
 
 class RecordAdmin(admin.ModelAdmin):
@@ -22,4 +22,4 @@ admin.site.register(Genre)
 admin.site.register(Record, RecordAdmin)
 admin.site.register(Track, TrackAdmin)
 admin.site.register(OwnedRecord)
-
+admin.site.register(Review)

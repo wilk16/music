@@ -117,3 +117,26 @@ class OwnedRecord(models.Model):
 
     class Meta:
         ordering = ['-purchase_date']
+
+class Review(models.Model):
+    def __str__(self):
+        return "(" +str(self.create_date)[0:10] + ") - " +\
+                self.create_by.username + ": "+ self.review_text[0:100]
+
+    record_fk = models.ForeignKey(Record, on_delete=models.CASCADE)
+    review_text = models.TextField()
+    like_counter = models.IntegerField(default=0)
+    hidden = models.BooleanField(default=False)
+    create_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='review_create_by')
+    create_date = models.DateTimeField(auto_now_add=True)
+    modify_by = models.ForeignKey(User, default = 1,
+                                  on_delete=models.CASCADE,
+                                 related_name='review_modify_by')
+    modify_date = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-modify_date']
+
+

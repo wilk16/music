@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Band, Record, Track, OwnedRecord, Genre, Label
+from .models import Band, Record, Track, OwnedRecord, Genre, Label, Review
 from django.views import generic
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -177,6 +177,7 @@ class RecordView(generic.DetailView):
         for band in r.bands.all():
             for rec in band.record_set.all().exclude(id=r.id):
                 band_records.append(rec)
+        context['reviews'] = Record.objects.get(pk=self.kwargs.get('pk')).review_set.order_by('-modify_date')[0:10]
         context['band_records'] = band_records
         return context
 
