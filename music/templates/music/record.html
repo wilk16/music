@@ -12,7 +12,7 @@
 {% if tracks%}
 <ul>
 {% for track in tracks %}
-{{track.number}}. {{track.name}}{% if track.feat.all %} (featuring:{% for feats in track.feat.all%}<a href={% url 'music:band' feats.id %}>{{feats.name}}</a>{%if not forloop.last%}, {%endif%}{%endfor%}){%endif%} [{{track.length|time:"i:s" }}]<br>
+{{track.number}}. {{track.name}}{% if track.feat.all %} (featuring: {% for feats in track.feat.all%}<a href={% url 'music:band' feats.id %}>{{feats.name}}</a>{%if not forloop.last%}, {%endif%}{%endfor%}){%endif%} [{{track.length|time:"i:s" }}]<br>
 {% endfor %}
 </ul>
 {% else %}
@@ -25,9 +25,14 @@
 {{ review.review_text }}<br>
 {{ review.like_counter }} likes<br><br>
 {% empty%}
-There are no comments yet.
+<p>There are no reviews yet.</p>
 {% endfor %}
 
+{% if user.get_username %}
+<a href={% url 'music:add_review' record.id %}>Leave your opinion on {{record.title}}</a>
+{% else %}
+<p><a href="{% url 'login' %}">Log in</a> to write reviews</p>
+{% endif%}
 
 {% if band_records%}
 <h2>See other records by{% for band in record.bands.all %}

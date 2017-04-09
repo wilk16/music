@@ -1,0 +1,22 @@
+{% extends 'music/base.html' %}
+{% block title %}Add review{%endblock%}
+{% block content %}
+{% if user.get_username%}
+<h1>Write review for {{record.title}}</h1>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Save</button>
+    </form>
+<br>
+{% else %}
+<p>You have to be logged in to write reviews</p>
+{% endif %}
+{% for review in reviews %}
+{{ review.create_by.username }} wrote on {{review.create_date|date:"j M Y" }} {{ review.create_date|time:"H:i" }}:<br> 
+{{ review.review_text }}<br>
+{{ review.like_counter }} likes<br><br>
+{% empty%}
+<p>There are no reviews so far.</p>
+{% endfor %}
+{% endblock %}
+

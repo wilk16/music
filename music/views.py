@@ -1,12 +1,36 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import Band, Record, Track, OwnedRecord, Genre, Label, Review
+from music.models import Band, Record, Track, OwnedRecord, Genre, Label, Review
 from django.views import generic
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from music.forms import ContactForm
+from music.forms import ContactForm, ReviewForm
 from django.core.mail import send_mail
 
+
+
+def add_review(request, rec_id):
+    record = Record.objects.get(id=rec_id)
+    reviews= Record.objects.get(pk=rec_id).review_set.\
+            order_by('-modify_date')[0:10]
+
+    if request.method == "POST":
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.create_by = request.user
+            review.modify_by = request.user
+            review.hidden = False
+            review.like_counter = 0;
+            review.record_fk = record
+            review.save()
+            return redirect('music:record', pk=record.id)
+    else:
+        form = ReviewForm()
+
+    context = {'form':form, 'record':record, 'reviews':reviews}
+
+    return render(request, 'music/add_review.html', context)
 
 
 
@@ -113,8 +137,6 @@ class GenreListView(generic.ListView):
 
         context['object_type'] = 'Genres'
         return context
-
-
 
 
 
