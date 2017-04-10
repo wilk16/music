@@ -1,0 +1,16 @@
+{% extends 'music/base.html' %}
+{% block title %}Edit review{%endblock%}
+{% block content %}
+{% if user.get_username%}
+<h1>Edit your review of {{record.title}}</h1>
+    <form method="POST" class="post-form">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="save btn btn-default">Update</button>
+        <a href ={% url 'music:delete_review' review.id %}>Delete</a>
+    </form>
+<br>
+{% else %}
+<p>You have to be logged in to change reviews</p>
+{% endif %}
+{% endblock %}
+

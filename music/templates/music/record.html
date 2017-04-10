@@ -2,7 +2,6 @@
 {% block title %}Record/{{ record.title }}{% endblock %}
 {% block content %}
 
-
 <h1>{{record.title}} <i>({{record.release_date}})</i> </h1>
 <h2>by 
 {% for band in record.bands.all %}
@@ -19,20 +18,27 @@
 <p>No tracks available</p>
 {% endif %}
 
+
 <h2>Other users thougths on this record</h2>
 {% for review in reviews %}
-{{ review.create_by.username }} wrote on {{review.create_date|date:"j M Y" }} {{ review.create_date|time:"H:i" }}:<br> 
-{{ review.review_text }}<br>
-{{ review.like_counter }} likes<br><br>
+<p><b>{{ review.create_by.username }}</b> wrote on {{review.create_date|date:"j M Y" }} {{ review.create_date|time:"H:i" }}:<br> 
+{{ review.review_text }}</p>
 {% empty%}
 <p>There are no reviews yet.</p>
 {% endfor %}
 
+{% if own_review %}
+<h2>Here's your review (<a href={% url 'music:edit_review' own_review.id %}>edit</a>):</h2>
+<p><b>{{ own_review.create_by.username }}</b> wrote on {{own_review.create_date|date:"j M Y" }} {{ own_review.create_date|time:"H:i" }}:<br>
+{{ own_review.review_text }}</p>
+{% else %}
 {% if user.get_username %}
 <a href={% url 'music:add_review' record.id %}>Leave your opinion on {{record.title}}</a>
 {% else %}
 <p><a href="{% url 'login' %}">Log in</a> to write reviews</p>
-{% endif%}
+{% endif %}
+{% endif %}
+
 
 {% if band_records%}
 <h2>See other records by{% for band in record.bands.all %}

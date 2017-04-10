@@ -1,11 +1,46 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
 from music.models import Band, Record, Track, OwnedRecord, Genre, Label, Review
 from django.views import generic
 from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from music.forms import ContactForm, ReviewForm
 from django.core.mail import send_mail
+
+
+def delete_review(request, review_id):
+
+    review = get_object_or_404(Review, id=review_id)
+    if request.user != review.create_by:
+        return HttpResponseForbidden()
+    record = review.record_fk
+    if request.method == "POST":
+        review.delete()
+        return redirect('music:record', pk=record.id)
+
+    context = {'record':record, 'review':review}
+
+    return render(request, 'music/delete_review.html', context)
+
+
+
+def edit_review(request, review_id):
+
+    review = get_object_or_404(Review, id=review_id)
+    if request.user != review.create_by:
+        return HttpResponseForbidden()
+    record = review.record_fk
+    if request.method == "POST":
+        form = ReviewForm(request.POST, instance=review)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.save()
+            return redirect('music:record', pk=review.record_fk_id)
+    else:
+        form = ReviewForm(instance=review)
+    context = {'form':form, 'record':record, 'review':review}
+
+    return render(request, 'music/edit_review.html', context)
 
 
 
@@ -190,6 +225,7 @@ class RecordView(generic.DetailView):
     model = Record
     template_name = 'music/record.html'
 
+
     def get_context_data(self, **kwargs):
         context = super(RecordView, self).get_context_data(**kwargs)
         context['tracks'] = Track.objects.filter(
@@ -199,7 +235,15 @@ class RecordView(generic.DetailView):
         for band in r.bands.all():
             for rec in band.record_set.all().exclude(id=r.id):
                 band_records.append(rec)
-        context['reviews'] = Record.objects.get(pk=self.kwargs.get('pk')).review_set.order_by('-modify_date')[0:10]
+        try:
+            context['own_review']= Review.objects.filter(record_fk_id =\
+                                self.kwargs.get('pk')).get(create_by =\
+                                self.request.user)
+        except Review.DoesNotExist:
+            context['own_review'] = None
+        context['reviews'] = Record.objects.get(pk=self.kwargs.get('pk')).\
+                review_set.exclude(create_by = self.request.user).\
+                order_by('-modify_date')[0:10]
         context['band_records'] = band_records
         return context
 
@@ -209,7 +253,8 @@ class GenreView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(GenreView, self).get_context_data(**kwargs)
-        context['genre_records'] = Genre.objects.get(pk=self.kwargs.get('pk')).record_set.all()[0:10]
+        context['genre_records'] = Genre.objects.get(pk=self.kwargs.get('pk')).\
+                record_set.all()[0:10]
         return context
 
 

@@ -22,4 +22,8 @@ urlpatterns = [
             name='record_list'),
         url(r'^contact/$', views.contact, name='contact'),
         url(r'^record/(?P<rec_id>[0-9]+)/add_review/$', views.add_review, name='add_review'),
+        url(r'^edit_review/(?P<review_id>[0-9]+)/$', views.edit_review,
+            name='edit_review'),
+        url(r'^delete_review/(?P<review_id>[0-9]+)/$', views.delete_review,
+            name='delete_review'),
 ]
