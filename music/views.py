@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from music.forms import ContactForm, ReviewForm
 from django.core.mail import send_mail
+from django.db.models import Avg
 
 
 def delete_review(request, review_id):
@@ -52,7 +53,9 @@ def add_review(request, rec_id):
     if request.method == "POST":
         form = ReviewForm(request.POST)
         if form.is_valid():
+            cd = form.cleaned_data
             review = form.save(commit=False)
+            review.score = cd['score']
             review.create_by = request.user
             review.modify_by = request.user
             review.hidden = False
@@ -60,6 +63,8 @@ def add_review(request, rec_id):
             review.record_fk = record
             review.save()
             return redirect('music:record', pk=record.id)
+        else:
+            form = ReviewForm()
     else:
         form = ReviewForm()
 
@@ -91,7 +96,8 @@ class LabelView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(LabelView, self).get_context_data(**kwargs)
-        context['label_records'] = Label.objects.get(pk=self.kwargs.get('pk')).record_set.all()[0:10]
+        context['label_records'] = Label.objects.get(pk=self.kwargs.get('pk')).\
+                record_set.all()[0:10]
         return context
 
 
@@ -245,6 +251,7 @@ class RecordView(generic.DetailView):
                 review_set.exclude(create_by = self.request.user).\
                 order_by('-modify_date')[0:10]
         context['band_records'] = band_records
+        context['avg_score'] = r.review_set.all().aggregate(Avg('score'))
         return context
 
 class GenreView(generic.DetailView):

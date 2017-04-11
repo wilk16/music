@@ -10,8 +10,12 @@ class ContactForm(forms.Form):
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
-        fields = ('review_text', )
-        #widgets = {
-        #    'review_text': Textarea(attrs={'colls':80, 'rows':20}),
-        #}
+        fields = ('review_text', 'score')
 
+    def clean_score(self):
+        score = int(self.cleaned_data['score'])
+
+        if 0 <= score <=5:
+            return score
+        else:
+            raise forms.ValidationError('Score must be between 0 and 5')

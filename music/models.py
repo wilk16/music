@@ -127,6 +127,7 @@ class Review(models.Model):
     review_text = models.TextField()
     like_counter = models.IntegerField(default=0)
     hidden = models.BooleanField(default=False)
+    score = models.IntegerField(default=0)
     create_by = models.ForeignKey(User, default = 1,
                                   on_delete=models.CASCADE,
                                  related_name='review_create_by')

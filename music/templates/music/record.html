@@ -2,7 +2,7 @@
 {% block title %}Record/{{ record.title }}{% endblock %}
 {% block content %}
 
-<h1>{{record.title}} <i>({{record.release_date}})</i> </h1>
+<h1>{{record.title}} <i>({{record.release_date}})</i> {{ avg_score.score__avg }}/5</h1>
 <h2>by 
 {% for band in record.bands.all %}
 <i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
@@ -22,7 +22,7 @@
 <h2>Other users thougths on this record</h2>
 {% for review in reviews %}
 <p><b>{{ review.create_by.username }}</b> wrote on {{review.create_date|date:"j M Y" }} {{ review.create_date|time:"H:i" }}:<br> 
-{{ review.review_text }}</p>
+{{ review.score}}/5 - {{ review.review_text }}</p>
 {% empty%}
 <p>There are no reviews yet.</p>
 {% endfor %}
@@ -30,7 +30,7 @@
 {% if own_review %}
 <h2>Here's your review (<a href={% url 'music:edit_review' own_review.id %}>edit</a>):</h2>
 <p><b>{{ own_review.create_by.username }}</b> wrote on {{own_review.create_date|date:"j M Y" }} {{ own_review.create_date|time:"H:i" }}:<br>
-{{ own_review.review_text }}</p>
+{{ own_review.score}}/5 - {{ own_review.review_text }}</p>
 {% else %}
 {% if user.get_username %}
 <a href={% url 'music:add_review' record.id %}>Leave your opinion on {{record.title}}</a>
