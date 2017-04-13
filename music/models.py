@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -57,7 +58,8 @@ class Genre(models.Model):
                                   on_delete=models.CASCADE,
                                  related_name='genre_modify_by')
     modify_date = models.DateTimeField(auto_now=True)
-
+    slug = models.SlugField(max_length=50, allow_unicode=True,
+                           default = '')
     class Meta:
         ordering = ['name']
 

@@ -231,7 +231,6 @@ class RecordView(generic.DetailView):
     model = Record
     template_name = 'music/record.html'
 
-
     def get_context_data(self, **kwargs):
         context = super(RecordView, self).get_context_data(**kwargs)
         context['tracks'] = Track.objects.filter(
@@ -257,11 +256,13 @@ class RecordView(generic.DetailView):
 class GenreView(generic.DetailView):
     model = Genre
     template_name = 'music/genre.html'
+    slug_field = 'slug'
 
     def get_context_data(self, **kwargs):
         context = super(GenreView, self).get_context_data(**kwargs)
-        context['genre_records'] = Genre.objects.get(pk=self.kwargs.get('pk')).\
+        context['genre_records'] = Genre.objects.get(slug=self.kwargs.get('slug')).\
                 record_set.all()[0:10]
+        #context['genre_records'] = None
         return context
 
 

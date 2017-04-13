@@ -7,7 +7,8 @@ urlpatterns = [
         url(r'^band/(?P<pk>[0-9]+)/$', views.BandView.as_view(), name='band'),
         url(r'^record/(?P<pk>[0-9]+)/$', views.RecordView.as_view(),
             name='record'),
-        url(r'^genre/(?P<pk>[0-9]+)/$', views.GenreView.as_view(), name='genre'),
+        url(r'^genre/(?P<slug>[-\w]+)/$', views.GenreView.as_view(), name='genre'),
+
         url(r'^label/(?P<pk>[0-9]+)/$', views.LabelView.as_view(), name='label'),
         url(r'^userPanel/$', views.UserPanelView.as_view(), name='userPanel'),
 
