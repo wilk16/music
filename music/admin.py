@@ -9,6 +9,8 @@ class RecordAdmin(admin.ModelAdmin):
     list_display=('title', 'release_date', 'label_fk')
     filter_horizontal = ('bands', 'genres',)
     list_filter=('release_date',)
+    fields = ('title', 'bands', 'release_date', 'label_fk', 'genres')
+
 
 class TrackAdmin(admin.ModelAdmin):
     list_display=('name', 'record_fk', 'number')

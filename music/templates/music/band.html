@@ -9,7 +9,7 @@
 {% if band.record_set.all %}
 <ul>
 {% for record in band.record_set.all|sort_by:'-release_date' %}
-<li>{{record.release_date}}: <a href="{% url 'music:record' record.id%}"> {{record.title}}</a> at {{record.label_fk}} </li>
+<li>{{record.release_date}}: <a href="{% url 'music:record' record.slug%}"> {{record.title}}</a> at {{record.label_fk}} </li>
 {% endfor %}
 </ul>
 {% else %}
@@ -19,7 +19,7 @@
 Recently featured tracks:
 <ul>
 {% for track in band.track_set.all|sort_by:'-number' %}
-<li><i>{{track.name}}</i> on <a href="{% url 'music:record' track.record_fk.id%}"> {{track.record_fk.title}}</a></li>
+<li><i>{{track.name}}</i> on <a href="{% url 'music:record' track.record_fk.slug%}"> {{track.record_fk.title}}</a></li>
 {% endfor %}
 </ul>
 {% else %}

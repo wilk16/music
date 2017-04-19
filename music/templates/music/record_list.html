@@ -6,7 +6,7 @@
 {%if objects %}
 <ul>
 {% for object in objects %}
-<li><a href={% url 'music:record' object.id%}>{{ object.title }}</a></li>
+<li><a href={% url 'music:record' object.slug%}>{{ object.title }}</a></li>
 {% endfor %}
 </ul>
 {% else %}

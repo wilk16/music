@@ -7,7 +7,7 @@
 {%if ordered_bands %}
 <ul>
 {% for band in ordered_bands %}
-<li><a href={% url 'music:band' band.id%}>{{ band.name }}</a></li>
+<li><a href={% url 'music:band' band.slug%}>{{ band.name }}</a></li>
 {% endfor %}
 </ul>
 {% else %}
@@ -18,7 +18,7 @@
 {% if records %}
 <ul>
 {% for record in records%}
-<li><a href={% url 'music:record' record.id%}> {{ record.title }}</a></li>
+<li><a href={% url 'music:record' record.slug%}> {{ record.title }}</a></li>
 {% endfor %}
 </ul>
 {% else %}

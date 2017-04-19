@@ -2,16 +2,18 @@
 {% block title %}Record/{{ record.title }}{% endblock %}
 {% block content %}
 
-<h1>{{record.title}} <i>({{record.release_date}})</i> {{ avg_score.score__avg }}/5</h1>
+
+
+<h1>{{record.title}} <i>({{record.release_date}})</i> {{ record.get_avg_score }}/5</h1>
 <h2>by 
 {% for band in record.bands.all %}
-<i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
+<i><a href="{% url 'music:band' band.slug %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
 {% endfor %}
 </h2>
-{% if tracks%}
+{% if record.get_related_tracks%}
 <ul>
-{% for track in tracks %}
-{{track.number}}. {{track.name}}{% if track.feat.all %} (featuring: {% for feats in track.feat.all%}<a href={% url 'music:band' feats.id %}>{{feats.name}}</a>{%if not forloop.last%}, {%endif%}{%endfor%}){%endif%} [{{track.length|time:"i:s" }}]<br>
+{% for track in record.get_related_tracks %}
+{{track.number}}. {{track.name}}{% if track.feat.all %} (featuring: {% for feats in track.feat.all%}<a href={% url 'music:band' feats.slug %}>{{feats.name}}</a>{%if not forloop.last%}, {%endif%}{%endfor%}){%endif%} [{{track.length|time:"i:s" }}]<br>
 {% endfor %}
 </ul>
 {% else %}
@@ -20,17 +22,20 @@
 
 
 <h2>Other users thougths on this record</h2>
-{% for review in reviews %}
+{% if related_reviews %}
+{% for review in related_reviews %}
 <p><b>{{ review.create_by.username }}</b> wrote on {{review.create_date|date:"j M Y" }} {{ review.create_date|time:"H:i" }}:<br> 
 {{ review.score}}/5 - {{ review.review_text }}</p>
 {% empty%}
 <p>There are no reviews yet.</p>
 {% endfor %}
+{% endif %}
 
-{% if own_review %}
-<h2>Here's your review (<a href={% url 'music:edit_review' own_review.id %}>edit</a>):</h2>
-<p><b>{{ own_review.create_by.username }}</b> wrote on {{own_review.create_date|date:"j M Y" }} {{ own_review.create_date|time:"H:i" }}:<br>
-{{ own_review.score}}/5 - {{ own_review.review_text }}</p>
+
+{% if user_review %}
+<h2>Here's your review (<a href={% url 'music:edit_review' user_review.id %}>edit</a>):</h2>
+<p><b>{{ user_review.create_by.username }}</b> wrote on {{user_review.create_date|date:"j M Y" }} {{ user_review.create_date|time:"H:i" }}:<br>
+{{ user_review.score}}/5 - {{ user_review.review_text }}</p>
 {% else %}
 {% if user.get_username %}
 <a href={% url 'music:add_review' record.id %}>Leave your opinion on {{record.title}}</a>
@@ -40,18 +45,18 @@
 {% endif %}
 
 
-{% if band_records%}
+{% if record.get_bands_other_records%}
 <h2>See other records by{% for band in record.bands.all %}
-<i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
+<i><a href="{% url 'music:band' band.slug %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
 {% endfor %}:</h2>
 <ul>
-{% for all_record in band_records%}
-<li><a href={% url 'music:record' all_record.id %}>{{ all_record.title }}</a></li>
+{% for all_record in record.get_bands_other_records%}
+<li><a href={% url 'music:record' all_record.slug %}>{{ all_record.title }}</a></li>
 {% endfor %}
 </ul>
 {% else %}
 No more records available from {% for band in record.bands.all %}
-<i><a href="{% url 'music:band' band.id %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
+<i><a href="{% url 'music:band' band.slug %}">{{band.name}}</a></i>{% if not forloop.last%}, {% endif %}
 {% endfor %}
 {% endif %}
 

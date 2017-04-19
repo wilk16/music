@@ -1,9 +1,237 @@
 from django.test import TestCase, Client
-from music.models import Band, Record, Genre, Label, Track, OwnedRecord
+from music.models import Band, Record, Genre, Label, Track, OwnedRecord, Review
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
 import datetime
+from django.utils.text import slugify
+
+##----------------------Default Generators
+def create_user(_username = 'tester'):
+    return User.objects.create(username = _username)
+
+def create_band(_user, _name = 'sample_band', _origin='testLand'):
+    return Band.objects.create(name = _name, origin = _origin,\
+                              create_by = _user, modify_by = _user)
+
+def create_label(_user, _name = 'TestLabel', _city = 'TestCity',\
+                 _country = 'TestCountry', _website = 'test.abc.pl'):
+    return Label.objects.create(name = _name, city = _city, country = _country,
+                               website = _website, create_by = _user,
+                               modify_by = _user )
+
+def create_genre(_user, _name = 'TestGenre', _description = 'SomeText',\
+                 _source = 'test.src.pl'):
+    return Genre.objects.create(name = _name, description = _description,
+                               source = _source,
+                               create_by = _user, modify_by = _user)
+
+def create_record(_user, _label, _title = 'TestTitle', _bands = [],\
+                  _genres = [], _release_date = timezone.now()):
+    r = Record.objects.create(title = _title, release_date = _release_date,
+                                label_fk = _label,\
+                                create_by = _user, modify_by = _user)
+    for band in _bands:
+        r.bands.add(band)
+
+    for genre in _genres:
+        r.genres.add(genre)
+    r.save()
+    return r
+
+def create_review(_user, _record, _review_text = 'TestReview', _score = 3):
+    return Review.objects.create(review_text = _review_text, score = _score,\
+                                 record_fk = _record,\
+                                 create_by = _user, modify_by = _user)
+
+
+##-----------------------Model Tests
+
+
+
+class BandModelTests(TestCase):
+    """
+    Tests for band model
+    """
+
+    def setUp(self):
+        """
+        Initial setup of one band object
+        """
+        self.user= create_user()
+        self.band = create_band(_user = self.user)
+
+    def test_band_basic_properties(self):
+        """
+        Test basic scenarios: band name, origin and create_by
+        """
+        self.assertEqual(self.band.name, 'sample_band', 'wrong band name')
+        self.assertEqual(self.band.origin, 'testLand', 'wrong band origin')
+        self.assertEqual(self.band.create_by, self.user, 'wrong user')
+        self.assertTrue(timezone.now()- timezone.timedelta(days=1) <
+                        self.band.create_date<=timezone.now())
+
+    def test_create_and_modify_user(self):
+        """
+        test create_by and modify_by fields behavior
+        """
+        self.user2 = create_user(_username = 'user2')
+        self.assertEqual(self.band.create_by, self.user,
+                        'wrong create_by before update')
+        self.band.name = 'new_band'
+        self.band.modify_by = self.user2
+        self.band.save()
+        self.assertEqual(self.band.create_by, self.user,
+                        'wrong create_by after update')
+        self.assertEqual(self.band.modify_by, self.user2,
+                        'wrong modify_by')
+        self.assertEqual(self.band.name, 'new_band', 'band name not modified')
+        self.assertEqual(self.band.origin, 'testLand', 'band origin changed')
+
+
+class LabelModelTests(TestCase):
+    """
+    Test for label model
+    """
+
+    def setUp(self):
+        self.user = create_user()
+        self.label = create_label(_user = self.user)
+
+    def test_label_basic_properties(self):
+        """
+        Test if basic fields are properly filled
+        """
+        self.assertEqual(self.label.name, 'TestLabel', 'wrong label name')
+        self.assertEqual(self.label.city , 'TestCity', 'wrong label city')
+
+    def test_get_related_records_with_no_records(self):
+        """
+        Should return empty queryset
+        """
+
+        self.assertFalse(self.label.get_related_records())
+
+
+    def test_get_related_records_with_records(self):
+        """
+        Should return some records
+        """
+        self.genre = create_genre(_user = self.user)
+        self.band = create_band(_user = self.user)
+        self.record = create_record(_user = self.user, _bands = [self.band],
+                                   _genres = [self.genre], _label = self.label)
+
+        self.assertQuerysetEqual(self.label.get_related_records(),\
+                             ['<Record: TestTitle>'])
+
+
+class GenreModelTests(TestCase):
+    """
+    Test for genre model
+    """
+
+    def setUp(self):
+        self.user = create_user()
+        self.genre = create_genre(_user = self.user)
+
+    def test_genre_basic_properties(self):
+        """
+        Test if basic fields are properly filled
+        """
+        self.assertEqual(self.genre.name, 'TestGenre', 'wrong genre name')
+        self.assertEqual(self.genre.source , 'test.src.pl', 'wrong genre source')
+
+    def test_get_related_records_with_no_records(self):
+        """
+        Should return empty queryset
+        """
+
+        self.assertFalse(self.genre.get_related_records())
+
+
+    def test_get_related_records_with_records(self):
+        """
+        Should return some records
+        """
+        self.label = create_label(_user = self.user)
+        self.band = create_band(_user = self.user)
+        self.record = create_record(_user = self.user, _bands = [self.band],
+                                   _genres = [self.genre], _label = self.label)
+
+        self.assertQuerysetEqual(self.genre.get_related_records(),\
+                             ['<Record: TestTitle>'])
+
+
+class RecordModelTests(TestCase):
+    """
+    Test for record model
+    """
+    def setUp(self):
+        self.user = create_user()
+        self.genre = create_genre(_user = self.user)
+        self.label = create_label(_user = self.user)
+        self.band = create_band(_user = self.user)
+        self.record = create_record(_user = self.user, _bands = [self.band],
+                                   _label = self.label, _genres = [self.genre])
+
+    def test_record_basic_properties(self):
+        """
+        Test if basic fields are properly filled
+        """
+        self.assertEqual(self.record.title, 'TestTitle', 'wrong record title')
+        self.assertQuerysetEqual(self.record.bands.all(),
+                                 ['<Band: sample_band>'])
+        self.assertEqual(self.record.label_fk.name, 'TestLabel',
+                         'wrong record label')
+
+    def test_get_avg_score_with_no_reviews(self):
+        """
+        Method should return '-' when there are no reviews
+        """
+        self.assertEqual(self.record.get_avg_score(), '-')
+
+    def test_get_avg_score_with_reviews(self):
+        """
+        Method should return an average scores
+        """
+        self.review = create_review(_user = self.user, _record = self.record)
+
+        self.assertEqual(self.record.get_avg_score(), 3.0)
+        self.review2 = create_review(_user = self.user, _record = self.record,\
+                                    _score = 5)
+        self.assertEqual(self.record.get_avg_score(), 4.0)
+
+    def test_get_related_tracks_with_no_trakcs(self):
+        """
+        Method should return empty queryset
+        """
+        pass
+
+    def test_get_related_tracks_with_tracks(self):
+        """
+        Method should return tracks from this record
+        """
+        pass
+
+    def test_get_user_review_with_no_review(self):
+        """
+        Method should return None
+        """
+        pass
+
+    def test_get_user_review_with_review_when_not_authenticated(self):
+        """
+        Method should return None for unknown users
+        """
+        pass
+
+    def test_get_user_review_with_review_when_authenticated(self):
+        """
+        Method should return user's review
+        """
+        pass
+
 
 
 
@@ -12,7 +240,7 @@ class RecordListViewTests(TestCase):
     Tests for RecordList view
     """
     def setUp(self):
-        self.user = User.objects.create(username='tester')
+        self.user = create_user()
         self.c = Client()
 
     def test_no_label(self):
@@ -44,7 +272,6 @@ class RecordListViewTests(TestCase):
                                          modify_by=self.user)
         self.record.bands.add(self.band)
         self.record.genres.add(self.genre)
-
         response = self.c.get(reverse('music:label_list', kwargs={'page_nb':1}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['objects'].paginator.count, 1)
@@ -183,77 +410,6 @@ class OwnedRecordModelTests(TestCase):
         self.assertEqual(self.owned_record.user_fk.username, 'tester')
 
 
-
-class BandModelTests(TestCase):
-    """
-    Tests for band model
-    """
-    def setUp(self):
-        """
-        Initial setup of one band object
-        """
-        self.user= User.objects.create(username='tester')
-        self.band = Band.objects.create(name='myBand', origin='USA',
-                                       create_by=self.user, modify_by=self.user)
-
-    def test_simple_band(self):
-        """
-        Test basic scenarios: band name, origin and create_by
-        """
-        self.assertEqual(self.band.name, 'myBand')
-        self.assertEqual(self.band.origin, 'USA')
-        self.assertEqual(self.band.create_by, self.user)
-        self.assertTrue(timezone.now()- timezone.timedelta(days=1) < self.band.create_date<=timezone.now())
-
-    def test_create_and_modify_user(self):
-        """
-        test create_by and modify_by fields behavior
-        """
-        self.user2 = User.objects.create(username='modifier')
-        self.assertEqual(self.band.create_by, self.user,
-                        'wrong create_by before update')
-        self.band.name = 'new_band'
-        self.band.modify_by = self.user2
-        self.band.save()
-        self.assertEqual(self.band.create_by, self.user,
-                        'wrong create_by after update')
-        self.assertEqual(self.band.modify_by, self.user2,
-                        'wrong modify_by')
-        self.assertEqual(self.band.name, 'new_band', 'band name not modified')
-        self.assertEqual(self.band.origin, 'USA', 'band origin changed')
-        self.band.delete()
-        self.user.delete()
-        self.user2.delete()
-
-
-
-
-class RecordModelTests(TestCase):
-    """
-    Test for record model
-    """
-    def test_record_title(self):
-        """
-        test if setting up a record works by checking the title
-        """
-        self.user = User.objects.create(username = 'tester')
-        self.band = Band.objects.create(name='myBand', origin='Testland',
-                                       create_by=self.user, modify_by=self.user)
-        self.label = Label.objects.create(name='Test_music', city='Testcity',
-                            country='testcountry', website='www.mysite.pl',
-                                         create_by=self.user,
-                                         modify_by=self.user)
-        self.genre = Genre.objects.create(name='testgenre',
-                                         create_by=self.user,
-                                         modify_by=self.user)
-        self.record = Record.objects.create(title='mytitle',
-                          label_fk = self.label,
-                          release_date = '2017-02-03',
-                                         create_by=self.user,
-                                         modify_by=self.user)
-        self.record.bands.add(self.band)
-        self.record.genres.add(self.genre)
-        self.assertEqual(self.record.title, "mytitle")
 
 
 class RecordViewTests(TestCase):

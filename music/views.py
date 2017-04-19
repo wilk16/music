@@ -10,7 +10,9 @@ from django.db.models import Avg
 
 
 def delete_review(request, review_id):
-
+    """
+    View for deleting reviews
+    """
     review = get_object_or_404(Review, id=review_id)
     if request.user != review.create_by:
         return HttpResponseForbidden()
@@ -24,9 +26,10 @@ def delete_review(request, review_id):
     return render(request, 'music/delete_review.html', context)
 
 
-
 def edit_review(request, review_id):
-
+    """
+    View for editing reviews
+    """
     review = get_object_or_404(Review, id=review_id)
     if request.user != review.create_by:
         return HttpResponseForbidden()
@@ -44,8 +47,10 @@ def edit_review(request, review_id):
     return render(request, 'music/edit_review.html', context)
 
 
-
 def add_review(request, rec_id):
+    """
+    View for adding reviews
+    """
     record = Record.objects.get(id=rec_id)
     reviews= Record.objects.get(pk=rec_id).review_set.\
             order_by('-modify_date')[0:10]
@@ -73,8 +78,10 @@ def add_review(request, rec_id):
     return render(request, 'music/add_review.html', context)
 
 
-
 def contact(request):
+    """
+    View for sending contact messages
+    """
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
@@ -89,23 +96,19 @@ def contact(request):
     return render(request, 'music/contact_form.html', {'form':form})
 
 
-
 class LabelView(generic.DetailView):
+    """
+    View for displaying label details
+    """
     model = Label
     template_name = 'music/label.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(LabelView, self).get_context_data(**kwargs)
-        context['label_records'] = Label.objects.get(pk=self.kwargs.get('pk')).\
-                record_set.all()[0:10]
-        return context
-
-
-
-
-
 
 class RecordListView(generic.ListView):
+    """
+    View for displaying list of Records
+    """
+
     template_name = 'music/record_list.html'
 
     def get_queryset(self):
@@ -124,13 +127,14 @@ class RecordListView(generic.ListView):
             context['objects'] = paginator.page(1)
         except EmptyPage:
             context['objects'] = paginator.page(paginator.num_pages)
-
-        context['object_type'] = 'Records'
         return context
 
 
-
 class LabelListView(generic.ListView):
+    """
+    View for displaying list of Labels
+    """
+
     template_name = 'music/label_list.html'
 
     def get_queryset(self):
@@ -150,12 +154,15 @@ class LabelListView(generic.ListView):
         except EmptyPage:
             context['objects'] = paginator.page(paginator.num_pages)
 
-        context['object_type'] = 'Labels'
         return context
 
 
-
 class GenreListView(generic.ListView):
+    """
+    View for displaying list of genre
+    """
+
+
     template_name = 'music/genre_list.html'
 
     def get_queryset(self):
@@ -163,7 +170,6 @@ class GenreListView(generic.ListView):
         It seems that I must have a get_queryset method...
         """
         return [1]
-
 
     def get_context_data(self, **kwargs):
         context = super(GenreListView, self).get_context_data(**kwargs)
@@ -176,12 +182,14 @@ class GenreListView(generic.ListView):
         except EmptyPage:
             context['objects'] = paginator.page(paginator.num_pages)
 
-        context['object_type'] = 'Genres'
         return context
 
 
-
 class BandListView(generic.ListView):
+    """
+    view for displaying list of bands
+    """
+
     template_name = 'music/band_list.html'
 
     def get_queryset(self):
@@ -189,7 +197,6 @@ class BandListView(generic.ListView):
         It seems that I must have a get_queryset method...
         """
         return [1]
-
 
     def get_context_data(self, **kwargs):
         context = super(BandListView, self).get_context_data(**kwargs)
@@ -201,12 +208,13 @@ class BandListView(generic.ListView):
             context['objects'] = paginator.page(1)
         except EmptyPage:
             context['objects'] = paginator.page(paginator.num_pages)
-
-        context['object_type'] = 'Bands'
         return context
 
 
 class IndexView(generic.ListView):
+    """
+    View for displaying home page.
+    """
     template_name = 'music/index.html'
 
     def get_queryset(self):
@@ -216,64 +224,59 @@ class IndexView(generic.ListView):
         return [1]
 
     def get_context_data(self, **kwargs):
-        # Call the base implementation first to get a context
         context = super(IndexView, self).get_context_data(**kwargs)
-        # Add in a QuerySet of all the books
         context['records'] = Record.objects.all()[:10]
         context['ordered_bands'] = Band.objects.order_by('name')[:15]
         return context
 
+
 class BandView(generic.DetailView):
+    """
+    View for displaying band details
+    """
+
     model = Band
     template_name = 'music/band.html'
 
+
 class RecordView(generic.DetailView):
+    """
+    View for displaying record details
+    """
+
     model = Record
     template_name = 'music/record.html'
 
     def get_context_data(self, **kwargs):
         context = super(RecordView, self).get_context_data(**kwargs)
-        context['tracks'] = Track.objects.filter(
-            record_fk = self.kwargs.get('pk'))
-        band_records= []
-        r = Record.objects.get(pk=self.kwargs.get('pk'))
-        for band in r.bands.all():
-            for rec in band.record_set.all().exclude(id=r.id):
-                band_records.append(rec)
-        try:
-            context['own_review']= Review.objects.filter(record_fk_id =\
-                                self.kwargs.get('pk')).get(create_by =\
-                                self.request.user)
-        except Review.DoesNotExist:
-            context['own_review'] = None
-        context['reviews'] = Record.objects.get(pk=self.kwargs.get('pk')).\
-                review_set.exclude(create_by = self.request.user).\
-                order_by('-modify_date')[0:10]
-        context['band_records'] = band_records
-        context['avg_score'] = r.review_set.all().aggregate(Avg('score'))
+        context['related_reviews'] = self.get_object().get_related_reviews\
+                    (self.request.user)
+        context['user_review'] = self.get_object().get_user_review\
+                (self.request.user)
         return context
+
 
 class GenreView(generic.DetailView):
+    """
+    View for displaying genre details
+    """
+
     model = Genre
     template_name = 'music/genre.html'
-    slug_field = 'slug'
 
-    def get_context_data(self, **kwargs):
-        context = super(GenreView, self).get_context_data(**kwargs)
-        context['genre_records'] = Genre.objects.get(slug=self.kwargs.get('slug')).\
-                record_set.all()[0:10]
-        #context['genre_records'] = None
-        return context
 
 
 class UserPanelView(generic.ListView):
+    """
+    View for displaying user's site
+    """
+
     model = OwnedRecord
     template_name = 'music/userPanel.html'
 
     def get_context_data(self, **kwargs):
         context = super(UserPanelView, self).get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['recent_records'] = OwnedRecord.objects.filter(purchase_date__lte=timezone.now()).filter(user_fk = self.request.user)
-        else:
-            context['recent_records'] = []
+        #context['recent_records'] = OwnedRecord.get_recent_records(self.request.user)
+
         return context
+

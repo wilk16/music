@@ -4,12 +4,12 @@ from . import views
 
 urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
-        url(r'^band/(?P<pk>[0-9]+)/$', views.BandView.as_view(), name='band'),
-        url(r'^record/(?P<pk>[0-9]+)/$', views.RecordView.as_view(),
+        url(r'^band/(?P<slug>[-\w]+)/$', views.BandView.as_view(), name='band'),
+        url(r'^record/(?P<slug>[-\w]+)/$', views.RecordView.as_view(),
             name='record'),
         url(r'^genre/(?P<slug>[-\w]+)/$', views.GenreView.as_view(), name='genre'),
 
-        url(r'^label/(?P<pk>[0-9]+)/$', views.LabelView.as_view(), name='label'),
+        url(r'^label/(?P<slug>[-\w]+)/$', views.LabelView.as_view(), name='label'),
         url(r'^userPanel/$', views.UserPanelView.as_view(), name='userPanel'),
 
         url(r'^band_list/(?P<page_nb>[0-9]+)/$', views.BandListView.as_view(),
