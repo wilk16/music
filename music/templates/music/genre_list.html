@@ -1,18 +1,39 @@
-{% extends "music/base.html" %}
+{% extends "music/base_list.html" %}
 {% block title %}Genre list{% endblock %}
+{% block name %}Genres {% endblock %}
 {% block content %}
+{% load static%}
+{% if objects %}
+<div class="container-fluid bg-3 text-center">    
+  <div class="row">
 
-<h1>Browse available genres:</h1>
-{%if objects %}
-<ul>
-{% for object in objects %}
-<li><a href={% url 'music:genre' object.slug %}>{{ object.name }}</a></li>
-{% endfor %}
-</ul>
+  {% for object in objects %}
+    
+  {% if forloop.counter0|divisibleby:3 %}
+    </div>
+</div><br>
+  <div class="container-fluid bg-3 text-center">    
+  <div class="row">
+  {% endif %}
+  
+    <div class="col-sm-3">
+      {% if object.image %}
+      <a href={% url 'music:genre' object.slug %}><img src="{{ object.image.url }}" class="img-responsive" style="width:100%" alt="Image"></a>
+      {% else %}
+      <a href={% url 'music:genre' object.slug %}><img src="https://placehold.it/150x80?text=IMAGE" class="img-responsive" style="width:100%" alt="Image"></a>
+      {% endif %}
+      <p><a href={% url 'music:genre' object.slug %}>{{object.name}}</a></p>
+    </div>
+    {% endfor%}
+  </div>
+</div><br>
 {% else %}
-<p>Oups! There are no genres at the time</p>
+<p>Oups! There are no labels at the time</p>
 {% endif %}
-<div class="pagination">
+
+
+
+<div class="container text-center">
     <span class="step-links">
         {% if objects.has_previous %}
             <a href={% url 'music:genre_list' objects.previous_page_number %}>previous</a>

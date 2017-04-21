@@ -1,138 +1,67 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
 <head>
-{% comment %}<link rel="stylesheet" href="style.css" /> {% endcomment %}
-<title>{% block title %}Wilkmusic{% endblock %}</title>
-<style>
-/* The side navigation menu */
-.sidenav {
-    height: 100%; /* 100% Full-height */
-    width: 0; /* 0 width - change this with JavaScript */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Stay on top */
-    top: 0;
-    left: 0;
-    background-color: #111; /* Black*/
-    overflow-x: hidden; /* Disable horizontal scroll */
-    padding-top: 60px; /* Place content 60px from the top */
-    transition: 0.5s; /* 0.5 second transition effect to slide in the sidenav */
-}
-
-/* The navigation menu links */
-.sidenav a {
-    padding: 8px 8px 8px 32px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #818181;
-    display: block;
-    transition: 0.3s
-}
-
-/* When you mouse over the navigation links, change their color */
-.sidenav a:hover, .offcanvas a:focus{
-    color: #f1f1f1;
-}
-
-/* Position and style the close button (top right corner) */
-.sidenav .closebtn {
-    position: absolute;
-    top: 0;
-    right: 25px;
-    font-size: 36px;
-    margin-left: 50px;
-}
-
-/* Style page content - use this if you want to push the page content to the right when you open the side navigation */
-#main {
-    transition: margin-left .5s;
-    padding: 20px;
-}
-
-/* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
-@media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
-}
-
-
-.headerbar ul {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    overflow: hidden;
-    background-color: #c3c3a2;
-}
-.headerbar li {
-    float: left;
-}
-
-.headerbar li a {
-    color: white;
-    text-align: center;
-    text-decoration: none;
-}
-
-
-
-
-</style>
+  <title>{% block title %}Wilkmusic{% endblock %}</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+    }
+    
+    /* Add a gray background color and some padding to the footer */
+    footer {
+      background-color: #f2f2f2;
+      padding: 25px;
+    }
+  </style>
 </head>
 <body>
 
-<script>
-/* Set the width of the side navigation to 250px */
-function openNav() {
-    document.getElementById("mySidenav").style.width = "250px";
-    /*document.getElementById("main").style.marginLeft = "250px";*/
-    document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
-    document.getElementById("headerbar2").style.backgroundColor = "rgba(0,0,0,0.4)";
-    }
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>                        
+      </button>
+      <a class="navbar-brand" href={% url 'music:index'%}>Wilkmusic</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a href={% url 'music:userPanel' %}>My stuff</a></li>
+        <li><a href={% url 'music:band_list' 1%}>Bands</a></li>
+        <li><a href={% url 'music:record_list' 1%}>Records</a></li>
+        <li><a href={% url 'music:genre_list' 1%}>Genres</a></li>
+        <li><a href={% url 'music:label_list' 1%}>Labels</a></li>
+        <li><a href={% url 'music:contact'%}>Contact</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        {% if user.get_username%}
+        <li><a href="{% url 'music:userPanel' %}"> {{user.get_username}}</a></li>
+        {% endif %}
+        {% if user.get_username%}
+        <li><a href={% url 'logout' %}><span class="glyphicon glyphicon-log-in"></span> Logout</a></li>
+        {% else %}
+        <li><a href={% url 'login' %}><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
 
-/* Set the width of the side navigation to 0 */
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    /*document.getElementById("main").style.marginLeft = "0";*/
-    document.body.style.backgroundColor = "white";
-    document.getElementById("headerbar2").style.backgroundColor = "#c3c3a2"
-}
-</script>
-
-<div id="mySidenav" class="sidenav">
-  <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-  <a href="{% url 'music:index'%}">Home</a>
-  <a href="{% url 'music:userPanel' %}">User</a>
-  <a href="{% url 'music:band_list' 1%}">Bands</a>
-  <a href="{% url 'music:record_list' 1%}">Records</a>
-  <a href="{% url 'music:label_list' 1%}">Labels</a>
-  <a href="{% url 'music:genre_list' 1%}">Genres</a>
-  <a href="{% url 'music:contact'%}">Contact</a>
-</div>
-
-
-<div class="headerbar" position="fixed" id="headerbar">
-<ul id ="headerbar2">
-<li style="float:left"><img src="{% static "images/logo.png" %}" alt="My image"/></li>
-
-
-<div width="50px" height="50px"><li style="float:right" top="30"><span style="font-size:30px;cursor:pointer" onclick="openNav()">&#9776; Menu</span></li></div>
-<li style="float:right">
-{% if user.get_username%}
-Hello:<a href="{% url 'music:userPanel' %}"> {{user.get_username}}</a></br>
-<a position="center" href="{% url 'logout' %}">Log out</a>
-{% else%}
-Hello Anonymus,</br>
-want to <a href="{% url 'login' %}">log in?</a></br>
-{% endif %}
-</li>
-</ul>
-</div>
-
-<div id="main" onclick="closeNav()">
-
+{% block jumbo%}{% endblock %}
 {% block content %}{% endblock %}
 
-</div>
+<footer class="container-fluid text-center">
+  <p>2017, Jakub Wilkowski</p>
+</footer>
 
 </body>
 </html>

@@ -1,6 +1,7 @@
 from django.conf.urls import url
-
+from django.conf import settings
 from . import views
+from django.conf.urls.static import static
 
 urlpatterns = [
         url(r'^$', views.IndexView.as_view(), name='index'),
@@ -28,3 +29,8 @@ urlpatterns = [
         url(r'^delete_review/(?P<review_id>[0-9]+)/$', views.delete_review,
             name='delete_review'),
 ]
+
+if settings.DEBUG:
+    # static files (images, css, javascript, etc.)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

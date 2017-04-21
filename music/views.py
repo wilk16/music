@@ -119,7 +119,7 @@ class RecordListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(RecordListView, self).get_context_data(**kwargs)
-        paginator = Paginator(Record.objects.all().order_by('title'), 15)
+        paginator = Paginator(Record.objects.all().order_by('title'), 12)
         page = self.kwargs['page_nb']
         try:
             context['objects'] = paginator.page(page)
@@ -145,7 +145,7 @@ class LabelListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(LabelListView, self).get_context_data(**kwargs)
-        paginator = Paginator(Label.objects.all().order_by('name'), 15)
+        paginator = Paginator(Label.objects.all().order_by('name'), 12)
         page = self.kwargs['page_nb']
         try:
             context['objects'] = paginator.page(page)
@@ -173,7 +173,7 @@ class GenreListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(GenreListView, self).get_context_data(**kwargs)
-        paginator = Paginator(Genre.objects.all().order_by('name'), 15)
+        paginator = Paginator(Genre.objects.all().order_by('name'), 12)
         page = self.kwargs['page_nb']
         try:
             context['objects'] = paginator.page(page)
@@ -200,7 +200,7 @@ class BandListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(BandListView, self).get_context_data(**kwargs)
-        paginator = Paginator(Band.objects.all().order_by('name'), 15)
+        paginator = Paginator(Band.objects.all().order_by('name'), 12)
         page = self.kwargs['page_nb']
         try:
             context['objects'] = paginator.page(page)

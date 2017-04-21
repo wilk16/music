@@ -7,8 +7,8 @@ import datetime
 from django.utils.text import slugify
 
 ##----------------------Default Generators
-def create_user(_username = 'tester'):
-    return User.objects.create(username = _username)
+def create_user(_username = 'tester', _password = 'aaaaaaaa'):
+    return User.objects.create(username = _username, password = _password)
 
 def create_band(_user, _name = 'sample_band', _origin='testLand'):
     return Band.objects.create(name = _name, origin = _origin,\
@@ -44,6 +44,22 @@ def create_review(_user, _record, _review_text = 'TestReview', _score = 3):
                                  record_fk = _record,\
                                  create_by = _user, modify_by = _user)
 
+def create_track(_user, _record, _feat, _name = 'TestTrack', _number = 1,\
+                 _length = '00:03:15'):
+    t = Track.objects.create(name = _name, number = _number, length = _length,
+                                 record_fk = _record,
+                                 create_by = _user, modify_by = _user)
+    for band in _feat:
+        t.feat.add(band)
+    t.save()
+    return t
+
+
+def create_ownedrecord(_user, _record, _purchase_date = timezone.now(),
+                       _disc_type = 'cd'):
+    return OwnedRecord.objects.create(record_fk = _record, user_fk = _user,
+                                     purchase_date = _purchase_date,
+                                     disc_type = _disc_type)
 
 ##-----------------------Model Tests
 
@@ -195,43 +211,228 @@ class RecordModelTests(TestCase):
         """
         Method should return an average scores
         """
-        self.review = create_review(_user = self.user, _record = self.record)
+        self.review = create_review(_user = self.user, _record = self.record,
+                                    _review_text='Text1')
 
         self.assertEqual(self.record.get_avg_score(), 3.0)
         self.review2 = create_review(_user = self.user, _record = self.record,\
-                                    _score = 5)
+                                    _score = 5, _review_text = 'text2')
         self.assertEqual(self.record.get_avg_score(), 4.0)
 
-    def test_get_related_tracks_with_no_trakcs(self):
+    def test_get_related_tracks_with_no_tracks(self):
         """
         Method should return empty queryset
         """
-        pass
+        self.assertFalse(self.record.get_related_tracks())
 
     def test_get_related_tracks_with_tracks(self):
         """
         Method should return tracks from this record
         """
-        pass
+        self.track = create_track(_user = self.user, _record = self.record,\
+                                 _feat = [])
+        self.assertQuerysetEqual(self.record.get_related_tracks(),\
+                                 ['<Track: TestTitle - TestTrack>'])
 
     def test_get_user_review_with_no_review(self):
         """
         Method should return None
         """
-        pass
+        self.client = Client()
+        self.client.login(username = self.user.username,
+                     password = self.user.password)
+        self.assertFalse(self.record.get_user_review(self.user))
 
     def test_get_user_review_with_review_when_not_authenticated(self):
         """
         Method should return None for unknown users
         """
+        ######fixit
         pass
+        
+        #self.user2 = create_user(_username = 't2', _password = 'zzzzzzzz')
+        #self.review = create_review(_user = self.user, _record = self.record,
+        #                           _review_text = 'text3')
+        #self.client.login(username = self.user2.username,
+        #                 password = self.user2.password)
+        #self.assertFalse(self.client.)
+
+        #self.assertFalse(self.record.get_user_review(self.user))
+
 
     def test_get_user_review_with_review_when_authenticated(self):
         """
         Method should return user's review
         """
-        pass
+        self.review = create_review(_user = self.user, _record = self.record,
+                                   _review_text = 'text4')
+        self.client.login(username = self.user.username,
+                     password = self.user.password)
 
+        self.assertEqual(self.record.get_user_review(self.user),
+                         self.review)
+
+    def test_get_related_reviews_when_not_authenticated(self):
+        """
+        Should return last 10 reviews
+        """
+        ######fixit
+        self.u2 = create_user(_username = 'u2')
+
+        self.review = create_review(_user = self.u2, _record = self.record)
+        self.review2 = create_review(_user = self.u2, _record = self.record)
+
+        self.assertEqual(self.record.get_related_reviews(self.user).count(),
+                         2)
+
+    def test_get_related_reviews_with_no_reviews(self):
+        """
+        Should return empty queryset
+        """
+        self.assertFalse(self.record.get_related_reviews(self.user))
+
+    def test_get_related_reviews_when_user_wrote_review(self):
+        """
+        Should return queryset without user's review
+        """
+        self.u2 = create_user(_username = 'u2')
+        self.review = create_review(_user = self.user, _record = self.record)
+        self.review2 = create_review(_user = self.u2, _record = self.record)
+        self.review3 = create_review(_user = self.u2, _record = self.record)
+
+        self.assertEqual(self.record.get_related_reviews(self.user).count(),
+                         2)
+
+    def test_get_bands_other_records_when_no_other_records(self):
+        """
+        Should return an empty list
+        """
+        self.assertFalse(self.record.get_bands_other_records())
+
+    def test_get_bands_other_records_with_other_records(self):
+        """
+        Should return a list of max 10 records
+        """
+        self.r2 = create_record(_user = self.user, _bands = [self.band],
+                                   _label = self.label, _genres = [self.genre])
+        self.assertEqual(self.record.get_bands_other_records(), [self.r2])
+
+    def test_get_bands_other_records_on_collab_record(self):
+        """
+        Should return a list of albums of all collaborating artists
+        """
+        self.b2 = create_band(_user = self.user, _name = 'Other_band')
+        self.r2 = create_record(_user = self.user, _bands = [self.b2],
+                                   _label = self.label, _genres = [self.genre])
+        self.r3 = create_record(_user = self.user, _label = self.label,
+                                    _bands = [self.band, self.b2],
+                                    _genres = [self.genre])
+        self.assertEqual(len(self.r3.get_bands_other_records()), 2)
+
+
+class TrackModelTests(TestCase):
+    """
+    Tests for track model
+    """
+    def setUp(self):
+        self.user = create_user()
+        self.genre = create_genre(_user = self.user)
+        self.label = create_label(_user = self.user)
+        self.band = create_band(_user = self.user)
+        self.record = create_record(_user = self.user, _bands = [self.band],
+                                   _label = self.label, _genres = [self.genre])
+        self.track = create_track(_user = self.user, _record = self.record,
+                                 _feat = [])
+
+    def test_track_basic_properties(self):
+        """
+        Test if fields are properly filled
+        """
+        self.assertEqual(self.track.name, 'TestTrack')
+        self.b2 = create_band(_user = self.user)
+        self.track.feat.add(self.b2)
+        self.track.save()
+        self.assertEqual(self.track.feat.all().count(), 1)
+
+
+class OwnedRecordModelTests(TestCase):
+    """
+    Test for OwnedRecord model
+    """
+    def setUp(self):
+        self.user = create_user()
+        self.genre = create_genre(_user = self.user)
+        self.label = create_label(_user = self.user)
+        self.band = create_band(_user = self.user)
+        self.record = create_record(_user = self.user, _bands = [self.band],
+                                   _label = self.label, _genres = [self.genre])
+
+    def test_basic_properties(self):
+        """
+        Test if fields are properly filled
+        """
+        self.ownedrecord = create_ownedrecord(_user = self.user,
+                                              _record = self.record)
+        self.assertEqual(self.ownedrecord.disc_type, 'cd')
+        self.assertEqual(self.ownedrecord.user_fk, self.user)
+
+    def test_get_recent_records_when_not_authorized(self):
+        """
+        Should return empty list
+        """
+        #self.ownedrecord = create_ownedrecord(_user = self.user,
+        #                                     _record = self.record)
+        #self.assertEqual(self.ownedrecord.get_recent_records(self.user), [])
+
+    def test_get_recent_records_when_no_records(self):
+        """
+        Should return empty list
+        """
+        self.ownedrecord = create_ownedrecord(_user = self.user,
+                                             _record = self.record)
+        self.u2 = create_user(_username = 'u2')
+
+        self.assertEqual(self.ownedrecord.get_recent_records(self.u2).count(),
+                        0)
+
+    def test_get_recent_records_with_from_past_and_future(self):
+        """
+        Should return a list of records bought in the past
+        """
+        self.ownedrecord = create_ownedrecord(_user = self.user,
+                                             _record = self.record)
+        self.ownedrecord2 = create_ownedrecord(_user = self.user,
+                                             _record = self.record,
+                                            _purchase_date = timezone.now() +
+                                                datetime.timedelta(days = 1))
+
+        self.assertEqual(self.ownedrecord.get_recent_records(self.user).count()
+                         , 1)
+
+
+
+class ReviewModelTests(TestCase):
+    """
+    Test for Review model
+    """
+    def setUp(self):
+        self.user = create_user()
+        self.genre = create_genre(_user = self.user)
+        self.label = create_label(_user = self.user)
+        self.band = create_band(_user = self.user)
+        self.record = create_record(_user = self.user, _bands = [self.band],
+                                   _label = self.label, _genres = [self.genre])
+
+    def test_basic_properties(self):
+        """
+        Test if fields are properly filled
+        """
+        self.review = create_review(_user = self.user, _record = self.record)
+        self.assertEqual(self.review.review_text, 'TestReview')
+        self.assertEqual(self.review.record_fk, self.record)
+
+
+##-----------------------View Tests
 
 
 
@@ -275,9 +476,6 @@ class RecordListViewTests(TestCase):
         response = self.c.get(reverse('music:label_list', kwargs={'page_nb':1}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['objects'].paginator.count, 1)
-
-
-
 
 
 
@@ -371,45 +569,6 @@ class BandListViewTests(TestCase):
         response = self.c.get(reverse('music:band_list', kwargs={'page_nb':1}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['objects'].paginator.count, 1)
-
-
-
-class OwnedRecordModelTests(TestCase):
-    """
-    Tests for OwnedRecords model
-    """
-    def setUp(self):
-        self.user = User.objects.create(username='tester')
-        self.band = Band.objects.create(name='myBand', origin='USA',
-                                       create_by=self.user, modify_by=self.user)
-        self.label = Label.objects.create(name='Test_music', city='Testcity',
-                            country='testcountry', website='www.mysite.pl',
-                                         create_by=self.user,
-                                         modify_by=self.user)
-        self.genre = Genre.objects.create(name='testgenre',
-                                         create_by=self.user,
-                                         modify_by=self.user)
-        self.record = Record.objects.create(title='mytitle',
-                          label_fk = self.label,
-                          release_date = '2017-02-03',
-                                         create_by=self.user,
-                                         modify_by=self.user)
-        self.record.bands.add(self.band)
-        self.record.genres.add(self.genre)
-
-    def test_OwnedRecord_create(self):
-        """
-        Check if created OwnedRecord has required attributes
-        """
-        self.owned_record = OwnedRecord.objects.create(disc_type='vinyl',
-                                               record_fk=self.record,
-                                               user_fk=self.user,
-                                               purchase_date=timezone.now())
-
-        self.assertEqual(self.owned_record.record_fk.title, 'mytitle')
-        self.assertEqual(self.owned_record.user_fk.username, 'tester')
-
-
 
 
 class RecordViewTests(TestCase):

@@ -53,6 +53,8 @@ class Label(models.Model):
                                  related_name='label_modify_by')
     modify_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=50, allow_unicode=True)
+    image = models.ImageField(upload_to = 'labels', blank=True)
+
 
     def save(self, *args, **kwargs):
         if not self.id:
@@ -243,12 +245,12 @@ class OwnedRecord(models.Model):
     disc_type = models.CharField(max_length=10, choices=disc_type_choice)
     user_fk = models.ForeignKey(User, default=1, on_delete=models.CASCADE)
 
-    def get_recent_records(user):
+    def get_recent_records(self, user):
         """
         Return a list of 10 latest bought records by current user
         """
         if user.is_authenticated():
-            return OwnedRecords.objects.filter(purchase_date__lte=\
+            return OwnedRecord.objects.filter(purchase_date__lte=\
                             timezone.now()).filter(user_fk = user)[0:10]
 
         else:
