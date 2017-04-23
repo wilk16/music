@@ -19,7 +19,7 @@ def delete_review(request, review_id):
     record = review.record_fk
     if request.method == "POST":
         review.delete()
-        return redirect('music:record', pk=record.id)
+        return redirect('music:record', slug=record.slug)
 
     context = {'record':record, 'review':review}
 
@@ -39,7 +39,7 @@ def edit_review(request, review_id):
         if form.is_valid():
             review = form.save(commit=False)
             review.save()
-            return redirect('music:record', pk=review.record_fk_id)
+            return redirect('music:record', slug=review.record_fk_slug)
     else:
         form = ReviewForm(instance=review)
     context = {'form':form, 'record':record, 'review':review}
@@ -47,14 +47,19 @@ def edit_review(request, review_id):
     return render(request, 'music/edit_review.html', context)
 
 
-def add_review(request, rec_id):
+def add_review(request, slug):
     """
     View for adding reviews
     """
-    record = Record.objects.get(id=rec_id)
-    reviews= Record.objects.get(pk=rec_id).review_set.\
+    record = Record.objects.get(slug=slug)
+    reviews= Record.objects.get(slug=slug).review_set.\
             order_by('-modify_date')[0:10]
-
+    try:
+        own_rev = Record.objects.get(slug=slug).review_set.\
+                filter(create_by = request.user)
+        return redirect('music:edit_review', review_id = own_rev.id)
+    except:
+        pass
     if request.method == "POST":
         form = ReviewForm(request.POST)
         if form.is_valid():
@@ -67,7 +72,7 @@ def add_review(request, rec_id):
             review.like_counter = 0;
             review.record_fk = record
             review.save()
-            return redirect('music:record', pk=record.id)
+            return redirect('music:record', slug=record.slug)
         else:
             form = ReviewForm()
     else:

@@ -5,7 +5,7 @@
 <h1>Do you really want to delete your review of {{record.title}}</h1>
     <form method="POST" class="post-form">{% csrf_token %}
         <button type="submit" class="save btn btn-default">Delete</button>
-        <a href ={% url 'music:record' record.id %}>Back</a>
+        <a href ={% url 'music:record' record.slug %}>Back</a>
     </form>
 <br>
 {% else %}

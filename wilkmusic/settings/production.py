@@ -31,6 +31,8 @@ ALLOWED_HOSTS = [
     '192.168.8.105',
     'testserver',
     'localhost',
+    'https://secret-falls-85516.herokuapp.com/',
+    '*',
 ]
 
 
@@ -84,13 +86,13 @@ WSGI_APPLICATION = 'wilkmusic.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'music',
-        'USER': 'jw',
-        'PASSWORD': 'qwerty',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': os.path.join(BASE_DIR, 'music'),
     }
 }
+
+import dj_database_url
+db_from_env = dj_database_url.config()
+DATABASES['default'].update(db_from_env)
 
 
 # Password validation

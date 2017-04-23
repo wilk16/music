@@ -4,7 +4,15 @@
 {% if user.get_username%}
 <h1>Write review for {{record.title}}</h1>
     <form method="POST" class="post-form">{% csrf_token %}
-        {{ form.as_p }}
+        {% for field in form %}
+        <div class="fieldWrapper">
+        {{ field.errors }}
+        {{ field.label_tag }}<br>{{ field }}
+        {% if field.help_text %}
+        <p class="help">{{ field.help_text|safe }}</p>
+        {% endif %}
+    </div>
+{% endfor %}
         <button type="submit" class="save btn btn-default">Save</button>
     </form>
 <br>
@@ -13,8 +21,7 @@
 {% endif %}
 {% for review in reviews %}
 {{ review.create_by.username }} wrote on {{review.create_date|date:"j M Y" }} {{ review.create_date|time:"H:i" }}:<br> 
-{{ review.review_text }}<br>
-{{ review.like_counter }} likes<br><br>
+{{ review.review_text }}<br><br>
 {% empty%}
 <p>There are no reviews so far.</p>
 {% endfor %}
