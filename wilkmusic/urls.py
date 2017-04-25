@@ -21,9 +21,12 @@ from music import views
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^music/', include('music.urls', namespace='music')),
+    url(r'^api/music/', include('music.api.urls', namespace='api-music')),
+
     #url('^', include('django.contrib.auth.urls')),
     url(r'^login/$', auth_views.login, name='login'),
     url(r'^logout/$', auth_views.logout, name='logout'),
     url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 

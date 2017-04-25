@@ -133,25 +133,17 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
+    os.path.join(BASE_DIR, 'static'),
     #'/var/www/static/',
 ]
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), "static_cdn")
+STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'staticfiles')
 
 
-LOGIN_REDIRECT_URL = '/music/userPanel'
+LOGIN_REDIRECT_URL = '/music/'
 LOGOUT_REDIRECT_URL = '/music/'
 
 
 # Media root for storing images
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'media_cdn')
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'mediafiles')
 MEDIA_URL = '/media/'
-
-
-# Configure email server
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'srampampam@gmail.com'
-EMAIL_HOST_PASSWORD = 'sramnaspam'
-EMAIL_PORT = 587
 
