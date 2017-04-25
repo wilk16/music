@@ -149,7 +149,7 @@ class Record(models.Model):
         """
         avg_score = self.review_set.all().aggregate(Avg('score'))['score__avg']
         if avg_score:
-            return avg_score
+            return str(round(float(avg_score),2))
         else:
             return '-'
 
@@ -252,7 +252,6 @@ class OwnedRecord(models.Model):
         if user.is_authenticated():
             return OwnedRecord.objects.filter(purchase_date__lte=\
                             timezone.now()).filter(user_fk = user)[0:10]
-
         else:
             return []
 

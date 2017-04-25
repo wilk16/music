@@ -35,12 +35,12 @@
     </div>
     <div class="collapse navbar-collapse" id="myNavbar">
       <ul class="nav navbar-nav">
-        <li><a href={% url 'music:userPanel' %}>My stuff</a></li>
+        {%comment %}<li><a href={% url 'music:userPanel' %}>My stuff</a></li> {% endcomment %}
         <li><a href={% url 'music:band_list' 1%}>Bands</a></li>
         <li><a href={% url 'music:record_list' 1%}>Records</a></li>
         <li><a href={% url 'music:genre_list' 1%}>Genres</a></li>
         <li><a href={% url 'music:label_list' 1%}>Labels</a></li>
-        <li><a href={% url 'music:contact'%}>Contact</a></li>
+        {%comment %}<li><a href={% url 'music:contact'%}>Contact</a></li> {% endcomment %}
       </ul>
       <ul class="nav navbar-nav navbar-right">
         {% if user.get_username%}
