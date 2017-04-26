@@ -43,4 +43,15 @@ urlpatterns = [
         url(r'^genre/(?P<slug>[-\w]+)/delete/$', GenreDeleteAPIView.as_view(),
             name='genre_delete'),
 
+        url(r'^record/$', RecordListAPIView.as_view(), name='record'),
+        #url(r'^record/create/$', RecordCreateAPIView.as_view(),
+        #    name='record_create'),
+        url(r'^record/(?P<slug>[-\w]+)/$', RecordDetailAPIView.as_view(),
+            name='record_detail'),
+        #url(r'^record/(?P<slug>[-\w]+)/update/$', RecordUpdateAPIView.as_view(),
+        #    name='record_update'),
+        url(r'^record/(?P<slug>[-\w]+)/delete/$', RecordDeleteAPIView.as_view(),
+            name='record_delete'),
+
+
 ]

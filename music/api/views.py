@@ -6,7 +6,7 @@ from rest_framework.generics import (
     CreateAPIView,
 )
 
-from music.models import Band, Label, Genre
+from music.models import Band, Label, Genre, Record
 from music.api.serializers import *
 
 
@@ -99,5 +99,38 @@ class GenreUpdateAPIView(RetrieveUpdateAPIView):
 class GenreDeleteAPIView(RetrieveDestroyAPIView):
     queryset = Genre.objects.all()
     serializer_class = GenreDetailSerializer
+    lookup_field = 'slug'
+
+"""
+class RecordCreateAPIView(CreateAPIView):
+    serializer_class = RecordCreateUpdateSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(create_by=self.request.user)
+        serializer.save(modify_by=self.request.user)
+"""
+
+class RecordListAPIView(ListAPIView):
+    queryset = Record.objects.all()
+    serializer_class = RecordListSerializer
+
+class RecordDetailAPIView(RetrieveAPIView):
+    queryset = Record.objects.all()
+    serializer_class = RecordDetailSerializer
+    lookup_field = 'slug'
+
+"""
+class RecordUpdateAPIView(RetrieveUpdateAPIView):
+    queryset = Record.objects.all()
+    serializer_class = RecordCreateUpdateSerializer
+    lookup_field = 'slug'
+
+    def perform_create(self, serializer):
+        serializer.save(modify_by=self.request.user)
+"""
+
+class RecordDeleteAPIView(RetrieveDestroyAPIView):
+    queryset = Record.objects.all()
+    serializer_class = RecordDetailSerializer
     lookup_field = 'slug'
 

@@ -15,7 +15,7 @@
 {% if genre.get_related_records%}
 Check out some {{ genre.name }} records:
 {% for rec in genre.get_related_records %}
-<li><a href="{% url 'music:record' rec.id %}">{{rec.title}}</a></li>
+<li><a href="{% url 'music:record' rec.slug %}">{{rec.title}}</a></li>
 {% endfor %}
 </ul>
 {% else %}
