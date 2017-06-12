@@ -104,3 +104,13 @@ ENV/
 
 # mkdocs documentation
 /site
+.idea/
+bin/
+dump.db
+include/
+local/
+media/
+mudb.dump
+mydb.dump
+pip-selfcheck.json
+share/

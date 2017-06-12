@@ -6,9 +6,15 @@
 <h1>Here are some bands in catalogue</h1>
 {%if ordered_bands %}
 <ul>
-{% for band in ordered_bands %}
-<li><a href={% url 'music:band' band.slug%}>{{ band.name }}</a></li>
-{% endfor %}
+        <form action="#" method="post" class="bandForm" id="bandForm">
+    {% for band in ordered_bands %}
+
+        <p>
+        <label><input type="checkbox" name="bands[]" value="{{ band.name }}" /><a href={% url 'music:band' band.slug%}>{{ band.name }}</a></label>
+        {% endfor %}
+    </p>
+    </form>
+
 </ul>
 {% else %}
 <p>No bands are available.</p>
@@ -17,11 +23,27 @@
 <h1>And some albums as well</h1>
 {% if records %}
 <ul>
-{% for record in records%}
-<li><a href={% url 'music:record' record.slug%}> {{ record.title }}</a></li>
-{% endfor %}
+    {% for record in records%}
+    <li><a href={% url 'music:record' record.slug%}> {{ record.title }}</a></li>
+    {% endfor %}
 </ul>
 {% else %}
 <p>No records available</p>
 {% endif %}
+
+</form>
+
+<button type="button" onclick="exportSelection()">Export</button>
+
+<script>
+function exportSelection() {
+	var bands = document.forms['bandForm'].elements[ 'bands[]' ];
+	ret_msg = ""
+    for (var i=0, len=bands.length; i<len; i++) {
+    	if (bands[i].checked){
+        	ret_msg+=bands[i].value+';'}
+	}
+    alert(ret_msg)
+}
+</script>
 {% endblock %}

@@ -1,12 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidden
-from music.models import Band, Record, Track, OwnedRecord, Genre, Label, Review
+from django.http import HttpResponseRedirect, HttpResponseForbidden
+from music.models import Band, Record, OwnedRecord, Genre, Label, Review
 from django.views import generic
-from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from music.forms import ContactForm, ReviewForm
 from django.core.mail import send_mail
-from django.db.models import Avg
 
 
 def delete_review(request, review_id):
